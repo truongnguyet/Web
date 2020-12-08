@@ -16,8 +16,9 @@ const uiConfig = {
 function Login(props) {
     return (
         <div>
-            <h1>My App</h1>
-            <p>Please sign-in:</p>
+            <h1>Lập trình web</h1>
+            <h2>Nhóm 10</h2>
+            <p>Đăng nhập</p>
             <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>
         </div>
     );

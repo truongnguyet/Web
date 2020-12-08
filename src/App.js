@@ -6,6 +6,10 @@ import { useEffect} from 'react'
 import {auth} from "./firebaseConfig";
 import { useGlobal} from 'reactn'
 import {useHistory} from 'react-router-dom'
+import CreatePhase from "./components/Setting/CreatePhase";
+import ListProcess from "./components/ListProcess";
+import YourProcess from "./components/YourProcess/YourProcess";
+
 function App() {
     const [,setUser] = useGlobal('user')
     const history = useHistory()
@@ -30,6 +34,9 @@ function App() {
       <Switch>
         <Route exact path={'/login'} component={Login}/>
         <Route exact path={'/'} component={Home} />
+        <Route exact path={'/setting'} component={CreatePhase} />
+        <Route exact path={'/list'} component={ListProcess} />
+        <Route exact path={'/your-process'} component={YourProcess} />
       </Switch>
     </div>
   );
