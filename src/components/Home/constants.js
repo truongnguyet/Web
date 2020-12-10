@@ -31,3 +31,68 @@ export const menuItems = [
 export const isRoute = routeName =>{
     return window.location.pathname === routeName
 }
+
+export const listField = [
+    {
+        type: 'short',
+        name: 'Short Text',
+        icon: <OpenWith/>,
+        description: 'Với các trường nhập liệu ngắn',
+    },
+    {
+        type: 'long',
+        name: 'Long Text',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'date',
+        name: 'Date',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'dateTime',
+        name: 'Date Time',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'checkBox',
+        name: 'CheckBox',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'email',
+        name: 'Email',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'phone',
+        name: 'Phone Number',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'dropDown',
+        name: 'DropDown Select',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'time',
+        name: 'Time',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'attachment',
+        name: 'Attachment',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'radio',
+        name: 'Radio',
+        icon: <OpenWith/>
+    },
+    {
+        type: 'assignee',
+        name: 'Assignee Select',
+        icon: <OpenWith/>
+    },
+
+]

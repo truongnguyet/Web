@@ -3,17 +3,53 @@ import {Fab, Dialog,DialogContent, DialogTitle, DialogActions, Button, TextField
 import {Add} from '@material-ui/icons'
 import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from 'react-router-dom'
+import {v4 as uuidv4} from 'uuid'
+import {firestore} from "../../firebaseConfig";
+import {useGlobal} from 'reactn'
+import moment from 'moment'
+import {toast} from "react-toastify";
 
 function IconInput(props) {
     const classes = useStyles();
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [name,setName] = useState('')
+    const [user] = useGlobal('user')
     const history = useHistory()
     const handleClose = () => {
         setOpen(false)
     }
-    const onAddProcess = () => {
-        history.push("/setting")
+    const onAddProcess = async () => {
+        setLoading(true)
+        try{
+            if(!name){
+                return
+            }
+            const id = uuidv4()
+            const processRef = firestore.doc(`process/${id}`)
+            const time = moment().format('YYYY-MM-DD')
+            const data = {
+                id,
+                status:"active", name,
+                createdBy:user.uid,
+                createdAt: time,
+                modifiedBy: null,
+                modifiedAt: null,
+                authName:user.displayName
+            }
+            await processRef.set(
+                data
+            )
+            toast.success('Thêm thành công')
+            history.push("/setting?id=" +id)
+        }catch (e){
+            console.log(e);
+            toast.error(` Lỗi ${e}`)
+        }finally {
+            setLoading(false)
+            handleClose()
+        }
+
     }
     return (
         <div>
@@ -26,11 +62,13 @@ function IconInput(props) {
                 <DialogTitle id="simple-dialog-title">Tạo mới quy trình</DialogTitle>
                 <DialogContent>
                     <TextField
-                    id="nameProcess"
-                    label="Tên quy trình"
-                    type="text"
-                    autoComplete="true"
-                    variant="filled"
+                        value={name}
+                        onChange={e=>setName(e.target.value)}
+                        id="nameProcess"
+                        label="Tên quy trình"
+                        type="text"
+                        autoComplete="true"
+                        variant="filled"
                     />
                 </DialogContent>
 
@@ -38,7 +76,7 @@ function IconInput(props) {
                     <Button disabled={loading} color={"primary"} onClick={handleClose}>
                         Hủy
                     </Button>
-                    <Button disabled={loading} color={"primary"} onClick={onAddProcess}>
+                    <Button disabled={loading || !name} color={"primary"} onClick={onAddProcess}>
                         Lưu
                     </Button>
                 </DialogActions>
