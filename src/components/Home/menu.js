@@ -17,9 +17,9 @@ import {
 } from "@material-ui/core";
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import IconInput from "../CreateButton";
 import {isRoute, menuItems} from "./constants";
 import { useHistory } from 'react-router-dom'
+import {auth} from "../../firebaseConfig";
 const drawerWidth = 250;
 
 const useStyles = makeStyles((theme) => ({
@@ -93,6 +93,9 @@ export default function MenuAppBar({children}) {
     const handleClose = () => {
         setAnchorEl(null);
     };
+    const onSignOut = () => {
+        auth.signOut();
+    }
 
 
     return (
@@ -134,8 +137,8 @@ export default function MenuAppBar({children}) {
                             open={open}
                             onClose={handleClose}
                         >
-                            <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>My account</MenuItem>
+                            <MenuItem onClick={handleClose}>Tài khoản của tôi</MenuItem>
+                            <MenuItem onClick={onSignOut}>Đăng xuất</MenuItem>
                         </Menu>
                     </div>
                 </Toolbar>
@@ -167,7 +170,6 @@ export default function MenuAppBar({children}) {
                 <div className={classes.toolbar}/>
                 {children}
             </main>
-            <IconInput/>
         </div>
     );
 }

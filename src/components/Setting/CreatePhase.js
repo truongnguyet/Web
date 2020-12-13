@@ -52,6 +52,13 @@ const useStyles = makeStyles(theme => ({
             margin: theme.spacing(1),
             width: '25ch',
         },
+    },
+    inputContainer:{
+        width:"90%",
+        margin:'auto'
+    },
+    input:{
+        marginBottom:"20px"
     }
 }));
 
@@ -67,7 +74,7 @@ function CreatePhase(props) {
     const classes = useStyles();
     const [value, setValue] = useState(0);
     const theme = useTheme();
-    const [open,setOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -76,6 +83,20 @@ function CreatePhase(props) {
     const handleChangeIndex = index => {
         setValue(index);
     };
+    const phases = [
+        {
+            label: "Giai đoạn 1",
+
+        },
+        {
+            label: "Giai đoạn 2",
+
+        },
+        {
+            label: "Giai đoạn 3",
+
+        },
+    ]
     return (
         <div>
             <MenuAppBar>
@@ -88,9 +109,14 @@ function CreatePhase(props) {
                             textColor="inherit"
                             variant="fullWidth"
                         >
-                            <Tab className={classes.labelColor} label="Giai đoạn 1" {...a11yProps(0)} />
-                            <Tab className={classes.labelColor} label="Giai đoạn 2" {...a11yProps(1)} />
-                            <Tab className={classes.labelColor} label="Giai đoạn 3" {...a11yProps(2)} />
+                            {
+                                phases.map((phase, index) => {
+                                    return (
+                                        <Tab className={classes.labelColor} label={phase.label} {...a11yProps(index)} />
+                                    )
+                                })
+                            }
+
                         </Tabs>
                     </AppBar>
                     <div>
@@ -99,28 +125,35 @@ function CreatePhase(props) {
                             index={value}
                             onChangeIndex={handleChangeIndex}
                         >
-                            <TabPanel value={value} index={0} dir={theme.direction} className={classes.body}>
-                                <p>Giai đoạn 1</p>
-                                <div>
-                                    <h3>Cài đặt</h3>
-                                    <form className={classes.formText} noValidate autoComplete="off">
-                                        <label>Tên giai đoạn</label>
-                                        <TextField id="outlined-basic" label="Tên giai đoạn" variant="outlined"/>
-                                        <label>Mô tả</label>
-                                        <TextField id="outlined" label="Mô tả" variant="outlined" multiline rows={3}/>
-                                    </form>
-                                    <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
-                                        Thêm trường
-                                    </Button>
-                                    <AddField open={open} setOpen={setOpen} />
-                                </div>
-                            </TabPanel>
-                            <TabPanel value={value} index={1} dir={theme.direction} className={classes.body}>
-                                <p>Giai đoạn 2</p>
-                            </TabPanel>
-                            <TabPanel value={value} index={2} dir={theme.direction}>
-                                <p>Giai đoạn 3</p>
-                            </TabPanel>
+                            {phases.map((phase, index) => {
+                                return (
+                                    <TabPanel value={value} index={index} dir={theme.direction}
+                                              className={classes.body}>
+                                        <p>{phase.label}</p>
+                                        <div>
+                                            <h3>Cài đặt</h3>
+                                            <form className={classes.formText} noValidate autoComplete="off">
+                                                <div className={classes.inputContainer}>
+                                                    <TextField id="outlined-basic" label="Tên giai đoạn"
+                                                               variant="outlined"
+                                                               fullWidth={true}
+                                                               className={classes.input}
+                                                    />
+                                                    <TextField id="outlined" label="Mô tả" variant="outlined" multiline
+                                                               rows={3} fullWidth={true}
+                                                               className={classes.input}
+                                                    />
+                                                </div>
+                                            </form>
+                                            <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+                                                Thêm trường
+                                            </Button>
+                                            <AddField open={open} setOpen={setOpen}/>
+                                        </div>
+                                    </TabPanel>
+                                )
+                            })}
+
                         </SwipeableViews>
                     </div>
                 </div>

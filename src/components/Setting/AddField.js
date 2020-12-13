@@ -11,37 +11,41 @@ import {
     ListItem,
     ListItemText,
     ListItemIcon,
-    TextField,
-    Switch
 } from '@material-ui/core';
 import {makeStyles} from "@material-ui/core/styles";
-import SendIcon from '@material-ui/icons/Send';
+import {listField} from '../Home/constants';
+import ListSubheader from "@material-ui/core/ListSubheader";
+import DialogAddField from "./dialogAddField";
 
 const useStyles = makeStyles(theme => ({
     container: {
         // width: 700,
         // height: '70vh',
         // backgroundColor: 'blue',
-        padding:0
+        padding: 0
     },
     content: {
         padding: 10,
     },
     paper: {
         minHeight: '60vh',
-        padding:10
+        padding: 10
     }
 }));
 
 function AddField({open, setOpen}) {
+    const [openDialog, setOpenDialog] = useState(false);
     const classes = useStyles();
-    const [checked, setChecked] = useState(true)
     const handleClose = () => {
         setOpen(false);
     }
-    const handleChange = (event) => {
-        setChecked(event.target.checked);
+
+    const onDropItem = (event) => {
+        const type = event.dataTransfer.getData("type");
+        event.preventDefault()
+        event.target.appendChild(document.getElementById(type).cloneNode(true))
     }
+
 
     return (
         <div>
@@ -57,51 +61,41 @@ function AddField({open, setOpen}) {
                                 <Paper className={classes.paper}>
                                     <div>
                                         <List>
-                                            <ListItem id={"short"} draggable={true} onDragStart={event=>{
-                                                event.dataTransfer.setData("type", "short");
-                                            }}>
-                                                <ListItemIcon><SendIcon/></ListItemIcon>
-                                                <ListItemText>Short Text</ListItemText>
-                                            </ListItem>
-                                            <p>Với các trường nhập liệu ngắn</p>
+                                            {listField.map((item, index) => {
+                                                return (
+                                                    <ListItem id={item.type} draggable={true} onDragStart={event => {
+                                                        event.dataTransfer.setData("type", item.type);
+                                                    }}>
+                                                        <ListItemIcon>{item.icon}</ListItemIcon>
+                                                        <ListItemText>{item.name}</ListItemText>
+                                                        <ListSubheader>{item.description}</ListSubheader>
+                                                    </ListItem>
+                                                )
+                                            })}
+
                                         </List>
-                                        <form noValidate autoComplete="off">
-                                            <TextField id="outlined" label="Tên trường" variant="outlined"/>
-                                            <TextField id="outlined-basic" label="Mô tả" variant="outlined"/>
-                                            <p>Trường này có bắt buộc?</p>
-                                            <Switch
-                                                checked={checked}
-                                                onChange={handleChange}
-                                                name="checkedA"
-                                                inputProps={{'aria-label': 'secondary checkbox'}}
-                                            />
-                                        </form>
-                                        <Button variant="contained" color="secondary">
-                                            Hủy
-                                        </Button>
-                                        <Button variant="contained" color="primary">
-                                            Lưu
-                                        </Button>
                                     </div>
 
 
                                 </Paper>
                             </Grid>
-                            <Grid item xs={6} onDrop={event=>{
+                            <Grid item xs={6} onDrop={event => {
                                 const type = event.dataTransfer.getData("type");
                                 event.preventDefault()
                                 event.target.appendChild(document.getElementById(type).cloneNode(true))
-                            }}  onDragOver={(e)=>e.preventDefault()}>
+                                setOpenDialog(true)
+                            }} onDragOver={(e) => e.preventDefault()}>
                                 <Paper className={classes.paper}>xs=6</Paper>
                             </Grid>
                         </Grid>
                     </div>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Hủy</Button>
-                    <Button>Lưu</Button>
+                    <Button onClick={handleClose} color='secondary' variant={'contained'}>Hủy</Button>
+                    <Button color='primary' variant='contained'>Hoàn thành</Button>
                 </DialogActions>
             </Dialog>
+            <DialogAddField open={openDialog} setOpen={setOpenDialog} type={'checkBox'}/>
         </div>
     );
 }

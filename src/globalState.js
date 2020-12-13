@@ -1,5 +1,6 @@
 import { setGlobal} from 'reactn'
 
 setGlobal({
-    user:{}
+    user:{},
+    listPhase: []
 })

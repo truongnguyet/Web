@@ -6,6 +6,7 @@ import {Typography} from "@material-ui/core";
 import MaterialTable from "material-table";
 import {firestore} from "../../firebaseConfig";
 import {makeStyles} from "@material-ui/core/styles";
+import IconInput from "../CreateButton";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -26,9 +27,9 @@ function Home(props) {
 
     const [columns] = useState([
         {
-            title: "Số thứ tự", field: "content", type: 'string',width:"50px",
+            title: "Số thứ tự", field: "content", type: 'string', width: "50px",
             render: data => {
-                console.log('du lieu trong bang',data);
+                console.log('du lieu trong bang', data);
                 if (data) {
                     return (
                         <div>{data.index + 1}</div>
@@ -42,7 +43,7 @@ function Home(props) {
             render: data => {
                 if (data.name) {
                     return (
-                       <div>{data.name}</div>
+                        <div>{data.name}</div>
                     )
                 }
             }
@@ -83,16 +84,16 @@ function Home(props) {
         },
     ])
 
-    const getData =  () => {
+    const getData = () => {
         setLoading(true)
-            return firestore.collection('process')
-                .onSnapshot(function (querySnap) {
-                    const listProcess = querySnap.docs.map(function(doc,index) {
-                        return {...doc.data(),id:doc.id,index}
-                    });
-                    setData(listProcess)
-                    setLoading(false)
+        return firestore.collection('process')
+            .onSnapshot(function (querySnap) {
+                const listProcess = querySnap.docs.map(function (doc, index) {
+                    return {...doc.data(), id: doc.id, index}
                 });
+                setData(listProcess)
+                setLoading(false)
+            });
     }
 
     useEffect(() => {
@@ -103,10 +104,6 @@ function Home(props) {
     }, [])
     return (
         <div>
-            {/*wellcome home. {user.displayName}*/}
-            {/*<button onClick={onLogOut}>*/}
-            {/*    log out*/}
-            {/*</button>*/}
             <MenuAppBar>
                 <Typography variant='h4'>
                     Danh sách quy trình:
@@ -146,6 +143,7 @@ function Home(props) {
                         // ]}
                     />
                 </div>
+                <IconInput/>
             </MenuAppBar>
         </div>
     );
