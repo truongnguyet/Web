@@ -2,5 +2,6 @@ import { setGlobal} from 'reactn'
 
 setGlobal({
     user:{},
-    listPhase: []
+    listPhase: [],
+    addedFields:[]
 })

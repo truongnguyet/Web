@@ -20,6 +20,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import {isRoute, menuItems} from "./constants";
 import { useHistory } from 'react-router-dom'
 import {auth} from "../../firebaseConfig";
+import {useGlobal} from 'reactn'
 const drawerWidth = 250;
 
 const useStyles = makeStyles((theme) => ({
@@ -83,6 +84,7 @@ export default function MenuAppBar({children}) {
     const [anchorEl, setAnchorEl] = useState(null);
     const [openMenu, setOpenMenu] = useState(true)
     const history = useHistory()
+    const [user] = useGlobal();
 
     const open = Boolean(anchorEl);
 
@@ -96,6 +98,7 @@ export default function MenuAppBar({children}) {
     const onSignOut = () => {
         auth.signOut();
     }
+
 
 
     return (

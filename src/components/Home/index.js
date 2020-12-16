@@ -29,7 +29,6 @@ function Home(props) {
         {
             title: "Số thứ tự", field: "content", type: 'string', width: "50px",
             render: data => {
-                console.log('du lieu trong bang', data);
                 if (data) {
                     return (
                         <div>{data.index + 1}</div>

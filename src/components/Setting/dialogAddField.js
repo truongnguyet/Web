@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core'
 import {makeStyles} from "@material-ui/core/styles";
 import {Delete, AddCircle} from '@material-ui/icons'
+import {useGlobal} from "reactn";
 
 
 const useStyles = makeStyles(theme => ({
@@ -17,36 +18,60 @@ const useStyles = makeStyles(theme => ({
         marginBottom: '15px'
     }
 }))
-
+const listOptionDefault = [
+    {
+        label: 'Lựa chọn 1',
+    },
+    {
+        label: 'Lựa chọn 2',
+    },
+    {
+        label: 'Lựa chọn 3',
+    }
+]
 function DialogAddField({open, setOpen, type}) {
     const classes = useStyles();
-    const [checked, setChecked] = useState(true)
+
+    const [listOption, setListOption] = useState([...listOptionDefault])
+    const [name, setName] = useState('')
+    const [description, setDescription] = useState('')
+    const [require, setRequire] = useState(true)
+    const [addedFields, setAddedField] = useGlobal("addedFields")
     const handleChange = (event) => {
-        setChecked(event.target.checked);
+        setRequire(event.target.checked);
     }
     const handleClose = () => {
         setOpen(false)
     }
-    const listOption = [
-        {
-            label: 'Lựa chọn 1',
-        },
-        {
-            label: 'Lựa chọn 2',
-        },
-        {
-            label: 'Lựa chọn 3',
-        }
-    ]
+
     const deleteOption = (index) => {
+        if(listOption.length === 1)
+            return null
         listOption.splice(index,1)
+        setListOption([...listOption])
     }
     const addOption = (index) => {
-        console.log(listOption.length)
         listOption.push({
             label: `Lựa chọn ${listOption.length + 1}`,
         })
-        console.log(listOption);
+        setListOption([...listOption])
+
+    }
+    const onAddField = () =>{
+
+        if(!name)
+            return
+        addedFields.push({
+            type,
+            name,
+            description,
+            require
+        })
+        setAddedField([...addedFields])
+        setName('')
+        setDescription('')
+        setRequire(true)
+        setOpen(false)
     }
     return (
         <div>
@@ -55,21 +80,26 @@ function DialogAddField({open, setOpen, type}) {
                 <DialogContent>
                     <div>
                         <TextField id="outlined-basic" label="Tên trường" variant="outlined"
+                                   value={name}
+                                   onChange={e=>setName(e.target.value)}
                                    className={classes.inputText}/>
-                        <TextField id="outlined" label="Mô tả" variant="outlined" className={classes.inputText}/>
+                        <TextField id="outlined" label="Mô tả" variant="outlined" className={classes.inputText}
+                                   value={description}
+                                   onChange={e=>setDescription(e.target.value)}
+                        />
                         {
                             type === 'checkBox' ?
                                 <div>
                                     <Typography variant='subtitle1'>Các lựa chọn</Typography>
-                                    {/*<Button onClick={addOption(1)}>*/}
-                                    {/*    <AddCircle/>*/}
-                                    {/*</Button>*/}
+                                    <Button onClick={()=>addOption(1)}>
+                                        <AddCircle/>
+                                    </Button>
                                     {listOption.map((item, index) => {
                                         return (
                                             <div>
                                                 <TextField label={item.label} variant="outlined"
                                                            className={classes.inputText}/>
-                                                {/*<Delete onClick={deleteOption(index)}/>*/}
+                                                <Delete onClick={()=>deleteOption(index)}/>
                                             </div>
                                         )
                                     })}
@@ -81,7 +111,7 @@ function DialogAddField({open, setOpen, type}) {
                         }
                         <p>Trường này có bắt buộc?</p>
                         <Switch
-                            checked={checked}
+                            checked={require}
                             onChange={handleChange}
                             name="checkedA"
                             inputProps={{'aria-label': 'secondary checkbox'}}
@@ -90,7 +120,7 @@ function DialogAddField({open, setOpen, type}) {
                 </DialogContent>
                 <DialogActions>
                     <Button color='secondary' variant='outlined' onClick={handleClose}>Hủy</Button>
-                    <Button color='primary' variant='outlined'>Lưu</Button>
+                    <Button color='primary' variant='outlined' onClick={onAddField}>Lưu</Button>
                 </DialogActions>
             </Dialog>
         </div>

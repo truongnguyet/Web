@@ -16,6 +16,9 @@ import {makeStyles} from "@material-ui/core/styles";
 import {listField} from '../Home/constants';
 import ListSubheader from "@material-ui/core/ListSubheader";
 import DialogAddField from "./dialogAddField";
+import {useGlobal} from 'reactn'
+import {TextFields} from "@material-ui/icons";
+import TextField from "@material-ui/core/TextField";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -33,8 +36,10 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function AddField({open, setOpen}) {
+function AddField({open, setOpen, phaseIndex}) {
     const [openDialog, setOpenDialog] = useState(false);
+    const [type, setType] = useState("");
+    const [addedFields, setAddedField] = useGlobal("addedFields")
     const classes = useStyles();
     const handleClose = () => {
         setOpen(false);
@@ -82,10 +87,29 @@ function AddField({open, setOpen}) {
                             <Grid item xs={6} onDrop={event => {
                                 const type = event.dataTransfer.getData("type");
                                 event.preventDefault()
-                                event.target.appendChild(document.getElementById(type).cloneNode(true))
+                                // event.target.appendChild(document.getElementById(type).cloneNode(true))
                                 setOpenDialog(true)
+                                setType(type)
+
                             }} onDragOver={(e) => e.preventDefault()}>
-                                <Paper className={classes.paper}>xs=6</Paper>
+                                <Paper className={classes.paper}>
+                                    {
+                                        addedFields.map(field => {
+                                            if (!field.type)
+                                                return null
+                                            if (field.type === 'short')
+                                                return (
+                                                    <div>
+                                                        <TextField
+                                                            label={field.name} variant="outlined" helperText={field.description}
+                                                        />
+                                                    </div>
+                                                )
+
+                                            return  null
+                                        })
+                                    }
+                                </Paper>
                             </Grid>
                         </Grid>
                     </div>
@@ -95,7 +119,7 @@ function AddField({open, setOpen}) {
                     <Button color='primary' variant='contained'>Hoàn thành</Button>
                 </DialogActions>
             </Dialog>
-            <DialogAddField open={openDialog} setOpen={setOpenDialog} type={'checkBox'}/>
+            <DialogAddField open={openDialog} setOpen={setOpenDialog} type={type}/>
         </div>
     );
 }

@@ -148,7 +148,7 @@ function CreatePhase(props) {
                                             <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
                                                 Thêm trường
                                             </Button>
-                                            <AddField open={open} setOpen={setOpen}/>
+                                            <AddField open={open} setOpen={setOpen} phaseIndex={index}/>
                                         </div>
                                     </TabPanel>
                                 )
