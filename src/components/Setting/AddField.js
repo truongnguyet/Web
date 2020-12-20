@@ -17,8 +17,7 @@ import {listField} from '../Home/constants';
 import ListSubheader from "@material-ui/core/ListSubheader";
 import DialogAddField from "./dialogAddField";
 import {useGlobal} from 'reactn'
-import {TextFields} from "@material-ui/icons";
-import TextField from "@material-ui/core/TextField";
+import RenderField from "./renderField";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -68,7 +67,7 @@ function AddField({open, setOpen, phaseIndex}) {
                                         <List>
                                             {listField.map((item, index) => {
                                                 return (
-                                                    <ListItem id={item.type} draggable={true} onDragStart={event => {
+                                                    <ListItem key={index} id={item.type} draggable={true} onDragStart={event => {
                                                         event.dataTransfer.setData("type", item.type);
                                                     }}>
                                                         <ListItemIcon>{item.icon}</ListItemIcon>
@@ -93,22 +92,7 @@ function AddField({open, setOpen, phaseIndex}) {
 
                             }} onDragOver={(e) => e.preventDefault()}>
                                 <Paper className={classes.paper}>
-                                    {
-                                        addedFields.map(field => {
-                                            if (!field.type)
-                                                return null
-                                            if (field.type === 'short')
-                                                return (
-                                                    <div>
-                                                        <TextField
-                                                            label={field.name} variant="outlined" helperText={field.description}
-                                                        />
-                                                    </div>
-                                                )
-
-                                            return  null
-                                        })
-                                    }
+                                    <RenderField arrayField={addedFields}/>
                                 </Paper>
                             </Grid>
                         </Grid>
@@ -116,7 +100,7 @@ function AddField({open, setOpen, phaseIndex}) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color='secondary' variant={'contained'}>Hủy</Button>
-                    <Button color='primary' variant='contained'>Hoàn thành</Button>
+                    <Button color='primary' variant='contained' onClick={handleClose}>Hoàn thành</Button>
                 </DialogActions>
             </Dialog>
             <DialogAddField open={openDialog} setOpen={setOpenDialog} type={type}/>

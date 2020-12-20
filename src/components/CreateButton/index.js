@@ -18,6 +18,7 @@ function IconInput(props) {
     const history = useHistory()
     const handleClose = () => {
         setOpen(false)
+        setName('')
     }
     const onAddProcess = async () => {
         setLoading(true)
@@ -51,6 +52,11 @@ function IconInput(props) {
         }
 
     }
+    const onEnter = async (e) => {
+       if( e.key === 'Enter') {
+          await onAddProcess();
+       }
+    }
     return (
         <div>
             <Fab color="secondary" aria-label={"add"} className={classes.fab} onClick={() => setOpen(true)}>
@@ -69,6 +75,7 @@ function IconInput(props) {
                         type="text"
                         autoComplete="true"
                         variant="filled"
+                        onKeyDown={onEnter}
                     />
                 </DialogContent>
 

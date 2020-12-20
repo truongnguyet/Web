@@ -21,14 +21,18 @@ const useStyles = makeStyles(theme => ({
 const listOptionDefault = [
     {
         label: 'Lựa chọn 1',
+        value: ''
     },
     {
         label: 'Lựa chọn 2',
+        value: ''
     },
     {
         label: 'Lựa chọn 3',
+        value: ''
     }
 ]
+
 function DialogAddField({open, setOpen, type}) {
     const classes = useStyles();
 
@@ -36,6 +40,7 @@ function DialogAddField({open, setOpen, type}) {
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [require, setRequire] = useState(true)
+    const [options, setOptions] = useState([])
     const [addedFields, setAddedField] = useGlobal("addedFields")
     const handleChange = (event) => {
         setRequire(event.target.checked);
@@ -45,27 +50,29 @@ function DialogAddField({open, setOpen, type}) {
     }
 
     const deleteOption = (index) => {
-        if(listOption.length === 1)
+        if (listOption.length === 1)
             return null
-        listOption.splice(index,1)
+        listOption.splice(index, 1)
         setListOption([...listOption])
     }
     const addOption = (index) => {
         listOption.push({
             label: `Lựa chọn ${listOption.length + 1}`,
+            value: ''
         })
         setListOption([...listOption])
 
     }
-    const onAddField = () =>{
+    const onAddField = () => {
 
-        if(!name)
+        if (!name)
             return
         addedFields.push({
             type,
             name,
             description,
-            require
+            require,
+            options: listOption.map(op => (op.value || ""))
         })
         setAddedField([...addedFields])
         setName('')
@@ -81,25 +88,30 @@ function DialogAddField({open, setOpen, type}) {
                     <div>
                         <TextField id="outlined-basic" label="Tên trường" variant="outlined"
                                    value={name}
-                                   onChange={e=>setName(e.target.value)}
+                                   onChange={e => setName(e.target.value)}
                                    className={classes.inputText}/>
                         <TextField id="outlined" label="Mô tả" variant="outlined" className={classes.inputText}
                                    value={description}
-                                   onChange={e=>setDescription(e.target.value)}
+                                   onChange={e => setDescription(e.target.value)}
                         />
                         {
                             type === 'checkBox' ?
                                 <div>
                                     <Typography variant='subtitle1'>Các lựa chọn</Typography>
-                                    <Button onClick={()=>addOption(1)}>
+                                    <Button onClick={() => addOption(1)}>
                                         <AddCircle/>
                                     </Button>
                                     {listOption.map((item, index) => {
                                         return (
-                                            <div>
+                                            <div key={index}>
                                                 <TextField label={item.label} variant="outlined"
-                                                           className={classes.inputText}/>
-                                                <Delete onClick={()=>deleteOption(index)}/>
+                                                           className={classes.inputText}
+                                                           value={item.value} onChange={e => {
+                                                    listOption[index].value = e.target.value
+                                                    setListOption([...listOption])
+                                                }
+                                                }/>
+                                                <Delete onClick={() => deleteOption(index)}/>
                                             </div>
                                         )
                                     })}
