@@ -15,19 +15,21 @@ const useStyles = makeStyles(theme => ({
         marginRight: theme.spacing(1),
         width: 200,
     },
+    root: {
+        padding: 10,
+    }
 
 }));
 
 function RenderField({arrayField}) {
     const classes = useStyles();
-    // const [addedFields, setAddedField] = useGlobal("addedFields")
     const [defaultTime, setDefaultTime] = useState(moment(new Date()).format('DD/MM/YYYY HH:mm'))
 
-    console.log('mang filed', arrayField);
+    // console.log('mang filed', arrayField);
     return (
-        <div>
+        <div className={classes.root}>
             {
-                arrayField.length === 0 ? 'Chưa có trường nào được chọn' :
+                arrayField.length === 0 ? '( Chưa có trường nào được chọn ) ' :
                     arrayField.map((field, index) => {
                         if (!field.type)
                             return null

@@ -1,6 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {useGlobal} from 'reactn'
-import {auth} from "../../firebaseConfig";
 import MenuAppBar from "./menu";
 import {Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button} from "@material-ui/core";
 import MaterialTable from "material-table";
@@ -8,7 +6,6 @@ import {firestore} from "../../firebaseConfig";
 import {makeStyles} from "@material-ui/core/styles";
 import IconInput from "../CreateButton";
 import {useHistory} from "react-router-dom";
-import {BatteryUnknown} from "@material-ui/icons";
 import {toast} from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
@@ -18,11 +15,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 function Home(props) {
-
-    const [user] = useGlobal('user')
-    const onLogOut = () => {
-        auth.signOut()
-    }
     const classes = useStyles();
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)

@@ -12,6 +12,7 @@ import ListProcess from "./components/ListProcess";
 import YourProcess from "./components/YourProcess/YourProcess";
 import ConfirmProcess from "./components/YourProcess/ConfirmProcess";
 import {toast, ToastContainer} from 'react-toastify'
+import 'react-overlay-loader/styles.css';
 
 function App() {
     const [, setUser] = useGlobal('user')
