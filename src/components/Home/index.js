@@ -2,12 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {useGlobal} from 'reactn'
 import {auth} from "../../firebaseConfig";
 import MenuAppBar from "./menu";
-import {Typography} from "@material-ui/core";
+import {Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button} from "@material-ui/core";
 import MaterialTable from "material-table";
 import {firestore} from "../../firebaseConfig";
 import {makeStyles} from "@material-ui/core/styles";
 import IconInput from "../CreateButton";
-
+import {useHistory} from "react-router-dom";
+import {BatteryUnknown} from "@material-ui/icons";
+import {toast} from "react-toastify";
 
 const useStyles = makeStyles((theme) => ({
     table: {
@@ -24,6 +26,8 @@ function Home(props) {
     const classes = useStyles();
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)
+    const [delProcess, setDelProcess] = useState(null)
+    const history = useHistory()
 
     const [columns] = useState([
         {
@@ -94,7 +98,21 @@ function Home(props) {
                 setLoading(false)
             });
     }
+    const handleDelete = async (data) =>{
+        try{
+            setLoading(true)
+            const ref = firestore.doc(`process/${data.id}`)
+            await ref.delete()
+            toast.success('Đã xóa')
 
+        }catch (e){
+            toast.error("xóa thất bại. thử lại sau")
+        }finally {
+            setDelProcess(null)
+            setLoading(false)
+        }
+        console.log(data);
+    }
     useEffect(() => {
         let unsub = getData()
         return () => {
@@ -122,30 +140,60 @@ function Home(props) {
                             },
                             showTextRowsSelected: true,
                         }}
-                        // actions={[
-                        //     {
-                        //         icon: 'edit',
-                        //         tooltip: 'Edit',
-                        //         onClick: (event, rowData) => {
-                        //             setData(rowData)
-                        //             // setOpenEdit(true);
-                        //         }
-                        //     },
-                        //     {
-                        //         icon: 'delete',
-                        //         tooltip: 'Delete',
-                        //         onClick: (event, rowData) => {
-                        //             setData(rowData)
-                        //             setOpenDelete(true);
-                        //         }
-                        //     },
-                        // ]}
+                        actions={[
+                            {
+                                icon: 'edit',
+                                tooltip: 'Edit',
+                                onClick: (event, rowData) => {
+                                    // console.log('du lieu hang',rowData);
+                                    setData(rowData)
+                                    history.push("/setting?id=" + rowData.id)
+                                }
+                            },
+                            {
+                                icon: 'delete',
+                                tooltip: 'Delete',
+                                onClick: (event, rowData) => {
+                                    console.log(rowData);
+                                    setDelProcess(rowData)
+                                    setData(rowData)
+                                    // setOpenDelete(true);
+                                }
+                            },
+                        ]}
                     />
                 </div>
+                <DialogDeleteProcess loading={loading} data={delProcess} setData={setDelProcess} onDelete={handleDelete} />
                 <IconInput/>
             </MenuAppBar>
         </div>
     );
+}
+
+function DialogDeleteProcess({data, setData,loading, onDelete}) {
+
+    const handleClose = () => {
+        setData(null)
+    }
+
+    if (!data)
+        return null
+    return (
+        <Dialog open={Boolean(data)} onClose={handleClose}>
+            <DialogTitle> Xóa quy trình</DialogTitle>
+            <DialogContent>
+                Bạn có muốn xóa process {data.name} ?
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose} disabled={loading} variant="outlined" color="secondary">
+                    Không Xóa
+                </Button>
+                <Button disabled={loading} onClick={()=>onDelete(data)} variant="outlined" color="primary">
+                    OK, Xóa
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
 }
 
 export default Home;

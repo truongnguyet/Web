@@ -73,7 +73,7 @@ function App() {
                 hideProgressBar={true}
                 closeOnClick={false}
                 autoClose={1000}
-                position={toast.POSITION.BOTTOM_RIGHT}
+                position={toast.POSITION.TOP_RIGHT}
             />
         </div>
     );
