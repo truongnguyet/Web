@@ -13,6 +13,7 @@ import YourProcess from "./components/YourProcess/YourProcess";
 import ConfirmProcess from "./components/YourProcess/ConfirmProcess";
 import {toast, ToastContainer} from 'react-toastify'
 import 'react-overlay-loader/styles.css';
+import StartProcess from "./components/ListProcess/startProcess";
 
 function App() {
     const [, setUser] = useGlobal('user')
@@ -68,6 +69,7 @@ function App() {
                 <Route exact path={'/list'} component={ListProcess}/>
                 <Route exact path={'/your-process'} component={YourProcess}/>
                 <Route exact path={'/confirm'} component={ConfirmProcess}/>
+                <Route exact path={'/start'} component={StartProcess}/>
             </Switch>
 
             <ToastContainer

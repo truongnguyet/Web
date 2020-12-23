@@ -32,6 +32,7 @@ const listOptionDefault = [
         value: ''
     }
 ]
+const array = ["checkBox", "radio", "dropDown"]
 
 function DialogAddField({open, setOpen, type}) {
     const classes = useStyles();
@@ -46,6 +47,7 @@ function DialogAddField({open, setOpen, type}) {
         setRequire(event.target.checked);
     }
     const handleClose = () => {
+        setAddedField([])
         setOpen(false)
     }
 
@@ -64,7 +66,6 @@ function DialogAddField({open, setOpen, type}) {
 
     }
     const onAddField = () => {
-
         if (!name)
             return
         addedFields.push({
@@ -79,6 +80,7 @@ function DialogAddField({open, setOpen, type}) {
         setDescription('')
         setRequire(true)
         setOpen(false)
+        setListOption(listOptionDefault)
     }
     return (
         <div>
@@ -95,7 +97,7 @@ function DialogAddField({open, setOpen, type}) {
                                    onChange={e => setDescription(e.target.value)}
                         />
                         {
-                            type === 'checkBox' ?
+                            array.includes(type) ?
                                 <div>
                                     <Typography variant='subtitle1'>Các lựa chọn</Typography>
                                     <Button onClick={() => addOption(1)}>

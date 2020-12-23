@@ -79,7 +79,7 @@ function ListProcess(props) {
 
     const getData = () => {
         setLoading(true)
-        return firestore.collection('process')
+        return firestore.collection('process').where('status', '==', 'active')
             .onSnapshot(function (querySnap) {
                 const listProcess = querySnap.docs.map(function (doc, index) {
                     return {...doc.data(), id: doc.id, index}
@@ -117,9 +117,9 @@ function ListProcess(props) {
                                 icon: 'visibility',
                                 tooltip: 'Chạy quy trình',
                                 onClick: (event, rowData) => {
-                                    // console.log('du lieu hang',rowData);
+                                    console.log('du lieu hang',rowData);
                                     setData(rowData)
-                                    // history.push("/setting?id=" + rowData.id)
+                                    history.push("/start?id=" + rowData.id)
                                 }
                             },
                         ]}

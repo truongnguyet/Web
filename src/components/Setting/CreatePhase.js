@@ -149,6 +149,7 @@ function CreatePhase(props) {
             setDesPhase(phase[value]?.desPhase || '')
             setProcess({...data, id: processSnap.id})
             setUserSelected(phase[value]?.users || [] )
+            setAddedFields(phase[value]?.fields || [])
         } catch (e) {
             toast.error(`Lỗi, ${e}`)
         }
@@ -176,6 +177,7 @@ function CreatePhase(props) {
         setNamePhase(phase[newValue]?.namePhase || '')
         setDesPhase(phase[newValue]?.desPhase || '')
         setAddedFields(phase[newValue]?.fields || [])
+        setUserSelected(phase[newValue]?.users || [])
     };
 
     const handleChangeIndex = index => {
@@ -206,11 +208,10 @@ function CreatePhase(props) {
                 namePhase,
                 desPhase: desPhase || '',
                 index,
-                fields: _.concat(phase[value] && phase[value].fields && Array.isArray(phase[value].fields) ?
-                    phase[value].fields : [], addedFields),
+                fields: addedFields,
                 users: userSelected,
             }
-            console.log(data);
+
             await phaseRef.set(
                 data
             )
@@ -302,12 +303,12 @@ function CreatePhase(props) {
                                                     Thêm trường
                                                 </Button>
                                                 <AddField open={open} setOpen={setOpen} phaseIndex={index}/>
-                                                {
-                                                    phase[value] && phase[value].fields && Array.isArray(phase[value].fields) ?
-                                                        <RenderField arrayField={phase[value].fields}/>
-                                                        :
-                                                        null
-                                                }
+                                                {/*{*/}
+                                                {/*    phase[value] && phase[value].fields && Array.isArray(phase[value].fields) ?*/}
+                                                {/*        <RenderField arrayField={phase[value].fields}/>*/}
+                                                {/*        :*/}
+                                                {/*        null*/}
+                                                {/*}*/}
                                                 <RenderField arrayField={addedFields}/>
                                                 <div className={classes.assignee}>
                                                     <Typography>Thêm người vào quy trình</Typography>
