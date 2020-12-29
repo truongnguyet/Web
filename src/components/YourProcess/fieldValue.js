@@ -1,16 +1,9 @@
-import React, {useState} from 'react';
-import {useGlobal} from "reactn";
+import React from 'react';
 import TextField from "@material-ui/core/TextField";
-import {
-    Checkbox,
-    FormControlLabel,
-    FormGroup,
-    Radio,
-    Typography
-} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import {Checkbox, FormControlLabel, FormGroup, Radio, Typography} from "@material-ui/core";
 import moment from "moment";
 import Select from "react-select";
+import {makeStyles} from "@material-ui/core/styles";
 
 
 const useStyles = makeStyles(theme => ({
@@ -32,19 +25,12 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-function RenderField({arrayField}) {
-    const classes = useStyles();
-    const [defaultTime, setDefaultTime] = useState(moment(new Date()).format('DD/MM/YYYY HH:mm'))
-
-    const [age, setAge] = useState('');
-
-    const handleChange = (event) => {
-        setAge(event.target.value);
-    };
+function FieldValue({arrayField}) {
+    const classes = useStyles()
     return (
-        <div className={classes.root}>
+        <div>
             {
-                arrayField.length === 0 ? '( Chưa có trường nào được chọn ) ' :
+                arrayField.length === 0 ? '( Không có trường nào được chọn ) ' :
                     arrayField.map((field, index) => {
                         if (!field.type)
                             return null
@@ -52,7 +38,7 @@ function RenderField({arrayField}) {
                             return (
                                 <div key={index} className={classes.container}>
                                     <TextField
-                                        label={field.name} variant="outlined" helperText={field.description}
+                                        label={field.name} variant="outlined" value={field.value} disabled
                                     />
                                 </div>
                             )
@@ -60,7 +46,7 @@ function RenderField({arrayField}) {
                             return (
                                 <div key={index} className={classes.container}>
                                     <TextField
-                                        label={field.name} variant="outlined" helperText={field.description}
+                                        label={field.name} variant="outlined" value={field.value} disabled
                                         multiline rows={3}
                                     />
                                 </div>
@@ -70,13 +56,13 @@ function RenderField({arrayField}) {
                                 <div key={index} className={classes.container}>
                                     <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <TextField
-                                        label={field.description}
                                         type="date"
-                                        defaultValue={moment().format('DD/MM/YYYY')}
+                                        value={field.value}
                                         className={classes.textField}
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
+                                        disabled
                                     />
 
                                 </div>
@@ -86,13 +72,13 @@ function RenderField({arrayField}) {
                                 <div key={index} className={classes.container}>
                                     <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <TextField
-                                        label={field.description}
                                         type="datetime-local"
-                                        defaultValue={defaultTime}
+                                        value={field.value}
                                         className={classes.textField}
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
+                                        disabled
                                     />
                                 </div>
                             )
@@ -106,7 +92,7 @@ function RenderField({arrayField}) {
                                             field?.options.map((a, index) => {
                                                 return (
                                                     <FormControlLabel key={index}
-                                                                      control={<Checkbox name={a}/>}
+                                                                      control={<Checkbox name={a} disabled/>}
                                                                       label={a}
                                                     />
                                                 )
@@ -120,13 +106,13 @@ function RenderField({arrayField}) {
                                 <div key={index} className={classes.container}>
                                     <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <TextField
-                                        label={field.description}
                                         type="time"
-                                        defaultValue={moment().format('HH:mm')}
+                                        value={field.value}
                                         className={classes.textField}
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
+                                        disabled
                                     />
                                 </div>
                             )
@@ -153,7 +139,7 @@ function RenderField({arrayField}) {
                                         {
                                             field?.options.map((a, index) => {
                                                 return (
-                                                    <FormControlLabel value={a} control={<Radio/>}
+                                                    <FormControlLabel value={a} control={<Radio disabled/>}
                                                                       label={a} key={index}/>
                                                 )
                                             })
@@ -165,13 +151,13 @@ function RenderField({arrayField}) {
                             return (
                                 <div key={index} className={classes.container}>
                                     <Typography variant="subtitle1">{field.name}</Typography>
-                                    <Typography variant="caption">{field.description}</Typography><br/>
                                     <Select
+                                        isMulti
                                         name="colors"
-                                        options={field?.options}
+                                        options={field.options}
                                         className="basic-multi-select"
                                         classNamePrefix="select"
-                                        // value={userSelected}
+                                        value={field.value}
                                     />
                                 </div>
                             )
@@ -179,9 +165,8 @@ function RenderField({arrayField}) {
                         return null
                     })
             }
-
         </div>
     );
 }
 
-export default RenderField;
+export default FieldValue;

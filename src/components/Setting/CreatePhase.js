@@ -11,7 +11,6 @@ import {firestore} from "../../firebaseConfig";
 import qs from 'query-string'
 import {useGlobal} from "reactn";
 import {useHistory} from "react-router-dom";
-import _ from 'lodash'
 import Select from 'react-select';
 import { LoadingOverlay, Loader } from 'react-overlay-loader';
 

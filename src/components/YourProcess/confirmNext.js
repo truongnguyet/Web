@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import moment from "moment";
 import TextField from "@material-ui/core/TextField";
 import {
     Button,
@@ -11,13 +10,15 @@ import {
     Radio,
     Typography
 } from "@material-ui/core";
+import moment from "moment";
 import Select from "react-select";
 import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
-import {toast} from "react-toastify";
-import {v4 as uuidv4} from "uuid";
+import {useGlobal} from "reactn";
 import {firestore} from "../../firebaseConfig";
-import {useGlobal} from 'reactn'
+import {v4 as uuidv4} from "uuid";
+import {toast} from "react-toastify";
+
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -42,10 +43,10 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-function ActionField({arrayField, user, setArrayField, phase, process}) {
+function ConfirmNext({arrayField, user, setArrayField, phase, process, openDialog, setOpenDialog, setOpen}) {
+    console.log('những user ở phase tiếp theo', user);
     const classes = useStyles();
     const history = useHistory()
-    const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [userAssign, setUserAssign] = useState([])
     const [values, setValues] = useState([...arrayField])
@@ -53,18 +54,15 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
 
     const [age, setAge] = useState('');
 
-
     const handleChange = (event) => {
         setAge(event.target.value);
     };
+
     const handleCancel = () => {
-        setArrayField([])
-        history.push('/list')
-        setUserAssign([])
-        setValues([])
-    }
-    const onNext = () => {
-        setOpen(true)
+        // setArrayField([])
+        // setUserAssign([])
+        // setValues([])
+        setOpenDialog(false)
     }
     const selectUser = (user) => {
         setUserAssign(user)
@@ -73,18 +71,14 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
         setLoading(true)
         try {
             // check data có required hay không
+            let id = process?.id
             const batch = firestore.batch()
-            let uid = 'process_' + uuidv4()
-            const dataProcess = {
-                createdAt: moment(new Date()).format('DD/MM/YYYY'),
-                createdBy: authUser.displayName,
-                idAuth: authUser.id,
-                state: 1,
-                id: uid,
-                nextUser: userAssign.id,
-                nameProcess: process.name,
-                idProcess: process.id
-            }
+            await firestore.collection(`processing`)
+                .doc(id)
+                .set({
+                    nextUser: userAssign.id,
+                }, {merge: true})
+
             const data = {
                 id: phase.id,
                 namePhase: phase.namePhase,
@@ -94,13 +88,10 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
                 users: phase.users,
             }
 
-            const phasingRef = firestore.doc(`processing/${uid}/phasing/${phase.id}`)
-            const processRef = firestore.doc(`processing/${uid}`)
-            batch.set(processRef,
-                dataProcess, {merge: true})
+            const phasingRef = firestore.doc(`processing/${id}/phasing/${phase.id}`)
             batch.set(phasingRef,
                 data
-            , {merge: true})
+                , {merge: true})
 
             await batch.commit()
             toast.success('Gửi đi thành công')
@@ -110,8 +101,9 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
             toast.error(`Lỗi `)
         } finally {
             setLoading(false)
+            setOpenDialog(false)
             setOpen(false)
-            history.push('/list')
+            history.push('/confirm')
         }
     }
     return (
@@ -317,39 +309,55 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
                         return null
                     })
             }
-            <div className={classes.buttonAction}>
-                <Button variant="outlined" color="secondary" onClick={handleCancel}>Hủy</Button>
-                <Button variant="outlined" color="primary" style={{marginLeft: 10}} onClick={onNext}>Chuyển đi</Button>
-            </div>
-            <Dialog open={open} onClose={() => setOpen(false)}>
-                <DialogTitle> Chọn người để chuyển tiếp</DialogTitle>
-                <DialogContent>
-                    <div>
-                        <Typography>Bạn muốn gửi đến ai?</Typography>
-                        <Select
-                            name="colors"
-                            options={user}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            onChange={selectUser}
-                            value={userAssign}
-                        />
-                    </div>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpen(false)} disabled={loading} variant="contained" color="secondary">
-                        Hủy
-                    </Button>
-                    <Button disabled={loading} variant="contained" color="primary"
-                            onClick={onAddData}
-                    >
-                        Gửi
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {
+                user?.length !== 0 ?
+                    <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                        <DialogTitle> Chọn người để chuyển tiếp</DialogTitle>
+                        <DialogContent>
+                            <div>
+                                <Typography>Bạn muốn gửi đến ai?</Typography>
+                                <Select
+                                    name="colors"
+                                    options={user}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    onChange={selectUser}
+                                    value={userAssign}
+                                />
+                            </div>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCancel} disabled={loading} variant="contained"
+                                    color="secondary">
+                                Hủy
+                            </Button>
+                            <Button disabled={loading} variant="contained" color="primary"
+                                    onClick={onAddData}
+                            >
+                                Gửi
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    :
+                    <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                        <DialogTitle> Xác nhận quy trình</DialogTitle>
+                        <DialogActions>
+                            <Button onClick={handleCancel} disabled={loading} variant="contained"
+                                    color="secondary">
+                                Hủy
+                            </Button>
+                            <Button disabled={loading} variant="contained" color="primary"
+                                    onClick={onAddData}
+                            >
+                                Đồng ý
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+            }
+
 
         </div>
     );
 }
 
-export default ActionField;
+export default ConfirmNext;

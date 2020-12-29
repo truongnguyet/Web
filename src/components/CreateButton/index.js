@@ -76,6 +76,7 @@ function IconInput(props) {
                         autoComplete="true"
                         variant="filled"
                         onKeyDown={onEnter}
+                        autoFocus={true}
                     />
                 </DialogContent>
 

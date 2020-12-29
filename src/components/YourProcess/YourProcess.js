@@ -4,18 +4,21 @@ import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
 import {firestore} from "../../firebaseConfig";
 import MaterialTable from "material-table";
+import {useGlobal} from 'reactn'
 
 const useStyles = makeStyles((theme) => ({
     table: {
         margin: "20px 0"
     },
 }))
+
 function YourProcess(props) {
 
     const classes = useStyles();
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)
     const history = useHistory()
+    const [user] = useGlobal('user')
 
     const [columns] = useState([
         {
@@ -30,18 +33,18 @@ function YourProcess(props) {
         },
 
         {
-            title: "Tên quy trình", field: "amountMoney", type: "string",
+            title: "Tên quy trình", field: "nameProcess", type: "string",
             render: data => {
-                if (data.name) {
+                if (data.nameProcess) {
                     return (
-                        <div>{data.name}</div>
+                        <div>{data.nameProcess}</div>
                     )
                 }
             }
         },
 
         {
-            title: "Người tạo", field: 'authName', type: "string",
+            title: "Giai đoạn hiện tại", field: 'authName', type: "string",
             render: data => {
                 if (data.authName) {
                     return (
@@ -52,23 +55,11 @@ function YourProcess(props) {
             }
         },
         {
-            title: "Thời gian tạo", field: "createdAt", type: "string",
+            title: "Kết quả", field: "state", type: "string",
             render: data => {
-                if (data.createdAt) {
+                if (data.state) {
                     return (
-                        <div>{data.createdAt}</div>
-                    )
-                }
-            }
-        },
-        {
-            title: "Trạng thái", field: "status", type: "boolean", defaultSort: 'asc',
-            render: data => {
-                if (data.status) {
-                    return (
-                        <div>
-                            {data.status === "active" ? "Đang hoạt động" : "Tạm ngừng"}
-                        </div>
+                        <div>{data.state === 1 ? 'Thành công' : 'Thất bại'}</div>
                     )
                 }
             }
@@ -77,11 +68,13 @@ function YourProcess(props) {
 
     const getData = () => {
         setLoading(true)
-        return firestore.collection('process')
+        return firestore.collection('processing')
+            .where("idAuth", "==", user.uid)
             .onSnapshot(function (querySnap) {
                 const listProcess = querySnap.docs.map(function (doc, index) {
                     return {...doc.data(), id: doc.id, index}
                 });
+                console.log('processing',listProcess);
                 setData(listProcess)
                 setLoading(false)
             });
@@ -113,7 +106,7 @@ function YourProcess(props) {
                         actions={[
                             {
                                 icon: 'visibility',
-                                tooltip: 'Chạy quy trình',
+                                tooltip: 'Xem',
                                 onClick: (event, rowData) => {
                                     // console.log('du lieu hang',rowData);
                                     setData(rowData)

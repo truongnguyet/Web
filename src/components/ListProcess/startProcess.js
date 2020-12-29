@@ -69,14 +69,14 @@ function StartProcess(props) {
                 <LoadingOverlay>
                     <Loader loading={loading} text={""}/>
                     <div>
-                        <Typography><span className={classes.boldText}>Tên quy trình:</span>  {process.name}</Typography>
+                        <Typography><span className={classes.boldText}>Tên quy trình:</span> {process.name}</Typography>
                         <Typography><span className={classes.boldText}>Giai đoạn:</span> {data.namePhase}</Typography>
                         <Typography style={{color: 'darkgray'}}>({data.desPhase})</Typography>
                         <p>Mời bạn điền thông tin vào các trường sau: </p>
                         <div>
                             {
                                 data && data.fields && Array.isArray(data.fields) ?
-                                    <ActionField arrayField={data.fields} user={userAssign} setArrayField={setField} />
+                                    <ActionField arrayField={data.fields} user={userAssign} setArrayField={setField} phase={ data} process={process}/>
                                     :
                                     <Typography>Không có trường nào được tạo</Typography>
                             }

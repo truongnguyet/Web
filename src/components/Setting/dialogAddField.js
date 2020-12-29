@@ -75,12 +75,13 @@ function DialogAddField({open, setOpen, type}) {
             require,
             options: listOption.map(op => (op.value || ""))
         })
+        // console.log(addedFields)
         setAddedField([...addedFields])
         setName('')
         setDescription('')
         setRequire(true)
         setOpen(false)
-        setListOption(listOptionDefault)
+        setListOption([])
     }
     return (
         <div>

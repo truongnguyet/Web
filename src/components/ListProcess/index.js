@@ -117,7 +117,6 @@ function ListProcess(props) {
                                 icon: 'visibility',
                                 tooltip: 'Chạy quy trình',
                                 onClick: (event, rowData) => {
-                                    console.log('du lieu hang',rowData);
                                     setData(rowData)
                                     history.push("/start?id=" + rowData.id)
                                 }

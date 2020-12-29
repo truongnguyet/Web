@@ -3,16 +3,27 @@ import MenuAppBar from "../Home/menu";
 import {firestore} from "../../firebaseConfig";
 import MaterialTable from "material-table";
 import {makeStyles} from "@material-ui/core/styles";
+import {useHistory} from "react-router-dom";
+import StartConfirm from "./startConfirm";
+import {useGlobal} from 'reactn'
 
 const useStyles = makeStyles((theme) => ({
     table: {
         margin: "20px 0"
     },
 }))
+
 function ConfirmProcess(props) {
     const classes = useStyles();
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false)
+    const [openConfirm, setConfirm] = useState(false)
+    const [process, setProcess] = useState({})
+    const [user] = useGlobal('user')
+    // console.log('du lieu nguoi dung', user.uid)
+    const handleClose = () => {
+        setConfirm(false)
+    }
 
     const [columns] = useState([
         {
@@ -27,29 +38,29 @@ function ConfirmProcess(props) {
         },
 
         {
-            title: "Tên quy trình", field: "amountMoney", type: "string",
+            title: "Tên quy trình", field: "nameProcess", type: "string",
             render: data => {
-                if (data.name) {
+                if (data.nameProcess) {
                     return (
-                        <div>{data.name}</div>
+                        <div>{data.nameProcess}</div>
                     )
                 }
             }
         },
 
         {
-            title: "Người tạo", field: 'authName', type: "string",
+            title: "Người khởi tạo", field: 'createdBy', type: "string",
             render: data => {
-                if (data.authName) {
+                if (data.createdBy) {
                     return (
-                        <div>{data.authName}</div>
+                        <div>{data.createdBy}</div>
                     )
                 }
                 return null
             }
         },
         {
-            title: "Thời gian tạo", field: "createdAt", type: "string",
+            title: "Thời gian gửi", field: "createdAt", type: "string",
             render: data => {
                 if (data.createdAt) {
                     return (
@@ -58,37 +69,30 @@ function ConfirmProcess(props) {
                 }
             }
         },
-        {
-            title: "Trạng thái", field: "status", type: "boolean", defaultSort: 'asc',
-            render: data => {
-                if (data.status) {
-                    return (
-                        <div>
-                            {data.status === "active" ? "Đang hoạt động" : "Tạm ngừng"}
-                        </div>
-                    )
-                }
-            }
-        },
     ])
 
     const getData = () => {
         setLoading(true)
-        return firestore.collection('process')
+        return firestore.collection('processing')
+            .where("nextUser", "==", user.uid)
+            .where("state", "==", 1)
             .onSnapshot(function (querySnap) {
                 const listProcess = querySnap.docs.map(function (doc, index) {
                     return {...doc.data(), id: doc.id, index}
                 });
+                // console.log('processing',listProcess);
                 setData(listProcess)
                 setLoading(false)
             });
     }
     useEffect(() => {
+        if(!user?.uid) return;
         let unsub = getData()
         return () => {
             if (unsub) unsub()
         }
-    }, [])
+    }, [user?.uid])
+
     return (
         <div>
             <MenuAppBar>
@@ -109,16 +113,16 @@ function ConfirmProcess(props) {
                         }}
                         actions={[
                             {
-                                icon: 'visibility',
-                                tooltip: 'Chạy quy trình',
+                                icon: 'doneAll',
+                                tooltip: 'Xác nhận',
                                 onClick: (event, rowData) => {
-                                    // console.log('du lieu hang',rowData);
-                                    setData(rowData)
-                                    // history.push("/setting?id=" + rowData.id)
+                                    setProcess(rowData)
+                                    setConfirm(true)
                                 }
                             },
                         ]}
                     />
+                    <StartConfirm open={openConfirm} setOpen={setConfirm} process={process}/>
                 </div>
             </MenuAppBar>
         </div>
