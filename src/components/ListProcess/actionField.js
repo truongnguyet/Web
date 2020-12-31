@@ -30,6 +30,8 @@ const useStyles = makeStyles(theme => ({
     },
     root: {
         padding: 10,
+        textAlign: "start",
+        marginLeft: 30,
     },
     formControl: {
         margin: theme.spacing(1),
@@ -38,6 +40,11 @@ const useStyles = makeStyles(theme => ({
     buttonAction: {
         textAlign: "right",
         marginTop: 20,
+    },
+    dialogAss: {
+        height: 200,
+        margin: "auto",
+        width: 300
     }
 
 }));
@@ -83,7 +90,8 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
                 id: uid,
                 nextUser: userAssign.id,
                 nameProcess: process.name,
-                idProcess: process.id
+                idProcess: process.id,
+                currentPhase: phase.namePhase,
             }
             const data = {
                 id: phase.id,
@@ -324,7 +332,7 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle> Chọn người để chuyển tiếp</DialogTitle>
                 <DialogContent>
-                    <div>
+                    <div className={classes.dialogAss}>
                         <Typography>Bạn muốn gửi đến ai?</Typography>
                         <Select
                             name="colors"

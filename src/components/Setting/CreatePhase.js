@@ -1,5 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {AppBar, Tab, Tabs, Typography, Box, TextField, Button} from "@material-ui/core";
+import {
+    AppBar,
+    Tab,
+    Tabs,
+    Typography,
+    Box,
+    TextField,
+    Button,
+    DialogTitle,
+    DialogContent,
+    DialogActions, Dialog
+} from "@material-ui/core";
 import MenuAppBar from "../Home/menu";
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import SwipeableViews from "react-swipeable-views";
@@ -12,7 +23,8 @@ import qs from 'query-string'
 import {useGlobal} from "reactn";
 import {useHistory} from "react-router-dom";
 import Select from 'react-select';
-import { LoadingOverlay, Loader } from 'react-overlay-loader';
+import {LoadingOverlay, Loader} from 'react-overlay-loader';
+import {ArrowBack, Close, Check} from '@material-ui/icons'
 
 
 function TabPanel(props) {
@@ -71,7 +83,19 @@ const useStyles = makeStyles(theme => ({
         marginBottom: "20px"
     },
     assignee: {
-        margin: 10,
+        marginLeft: 40,
+        marginBottom: 20,
+        width: "50%"
+    },
+    textAdd: {
+        textAlign: "left",
+        marginBottom: 10,
+        color: "black",
+    },
+    btnBack: {
+        float: "left",
+        marginLeft: 40,
+        marginBottom: 20,
     }
 }));
 
@@ -99,8 +123,11 @@ const phases = [
 
 function CreatePhase(props) {
     const classes = useStyles();
-    const [value, setValue] = useState(0);
+    const query = qs.parse(window.location.search)
+    const history = useHistory()
     const theme = useTheme();
+
+    const [value, setValue] = useState(0);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [namePhase, setNamePhase] = useState('')
@@ -108,10 +135,10 @@ function CreatePhase(props) {
     const [process, setProcess] = useState(null)
     const [phase, setPhase] = useState(phases)
     const [addedFields, setAddedFields] = useGlobal('addedFields')
-    const query = qs.parse(window.location.search)
-    const history = useHistory()
     const [assignee, setAssignee] = useState([])
     const [userSelected, setUserSelected] = useState([])
+    const [openPause, setOpenPause] = useState(false)
+    const [disablePause, setDisablePause] = useState(false)
 
     useEffect(() => {
         if (query?.id) {
@@ -120,6 +147,7 @@ function CreatePhase(props) {
             getUser()
         }
     }, [query?.id])
+
     const getInfo = async (id) => {
         try {
             const processSnap = await firestore.doc(`process/${id}`)
@@ -130,7 +158,10 @@ function CreatePhase(props) {
             }
 
             const data = processSnap.data()
-            // console.log(data);
+            console.log('du lieu cua process', data);
+            if (data && data.status !== "active") {
+                setDisablePause(true)
+            }
             const phaseSnap = await firestore.collection(`process/${id}/phases`)
                 .orderBy('index')
                 .get()
@@ -147,7 +178,7 @@ function CreatePhase(props) {
             setNamePhase(phase[value]?.namePhase || '')
             setDesPhase(phase[value]?.desPhase || '')
             setProcess({...data, id: processSnap.id})
-            setUserSelected(phase[value]?.users || [] )
+            setUserSelected(phase[value]?.users || [])
             setAddedFields(phase[value]?.fields || [])
         } catch (e) {
             toast.error(`Lỗi, ${e}`)
@@ -239,13 +270,71 @@ function CreatePhase(props) {
     const gotoHome = () => {
         history.push('/')
     }
+    const pauseProcess = async () => {
+        let uid = query?.id;
+        setLoading(true)
+        try {
+            if (uid) {
+                await firestore.collection(`process`)
+                    .doc(uid)
+                    .set({
+                        status: 'unactive'
+                    }, {merge: true})
+                setOpenPause(false)
+                setLoading(false)
+                setDisablePause(true)
+                toast.success("Bạn đã tạm ngừng quy trình này!")
+            }
+
+        } catch (e) {
+            console.log(e);
+            setLoading(false)
+            toast.error(`${e}`)
+            setOpenPause(false)
+        }
+    }
+
+    const playProcess = async () => {
+        let uid = query?.id;
+        setLoading(true)
+        try {
+            if (uid) {
+                await firestore.collection(`process`)
+                    .doc(uid)
+                    .set({
+                        status: 'active'
+                    }, {merge: true})
+                setOpenPause(false)
+                setLoading(false)
+                setDisablePause(false)
+                toast.success("Bạn đã hoạt động lại quy trình này!")
+            }
+
+        } catch (e) {
+            console.log(e);
+            setLoading(false)
+            toast.error(`${e}`)
+            setOpenPause(false)
+        }
+    }
+    const openDialogPause = () => {
+        setOpenPause(true)
+    }
 
     return (
         <div>
             <MenuAppBar>
-                <Button variant="outlined" color={"secondary"} onClick={gotoHome}>Quay lại</Button>
+                <Button variant="outlined" color={"secondary"} onClick={gotoHome} className={classes.btnBack}
+                        disabled={loading}>
+                    <ArrowBack/>
+                    Quay lại</Button>
+                <Button variant="outlined" color={"default"} onClick={openDialogPause} className={classes.btnBack}
+                        disabled={loading}>
+                    {disablePause ? <Check/> : <Close/>}
+                    {disablePause ? "Hoạt động" : "Tạm ngừng"}
+                </Button>
                 <LoadingOverlay>
-                    <Loader loading={loading} text={""} />
+                    <Loader loading={loading} text={""}/>
                     <div className={classes.root}>
                         <AppBar className={classes.appBar} position="static" color="default">
                             <Tabs
@@ -287,6 +376,7 @@ function CreatePhase(props) {
                                                                    className={classes.input}
                                                                    value={namePhase}
                                                                    onChange={e => setNamePhase(e.target.value)}
+                                                                   required={true}
                                                         />
                                                         <TextField id="outlined" label="Mô tả" variant="outlined"
                                                                    multiline
@@ -302,15 +392,10 @@ function CreatePhase(props) {
                                                     Thêm trường
                                                 </Button>
                                                 <AddField open={open} setOpen={setOpen} phaseIndex={index}/>
-                                                {/*{*/}
-                                                {/*    phase[value] && phase[value].fields && Array.isArray(phase[value].fields) ?*/}
-                                                {/*        <RenderField arrayField={phase[value].fields}/>*/}
-                                                {/*        :*/}
-                                                {/*        null*/}
-                                                {/*}*/}
                                                 <RenderField arrayField={addedFields}/>
                                                 <div className={classes.assignee}>
-                                                    <Typography>Thêm người vào quy trình</Typography>
+                                                    <Typography className={classes.textAdd}>Thêm người vào quy
+                                                        trình</Typography>
                                                     <Select
                                                         isMulti
                                                         name="colors"
@@ -322,6 +407,7 @@ function CreatePhase(props) {
                                                     />
                                                 </div>
                                                 <Button onClick={() => onAddPhase(index)} variant="contained"
+                                                        style={{float: "left", marginLeft: "30px"}}
                                                         color="secondary" disabled={loading || !namePhase}>Lưu</Button>
                                             </div>
                                         </TabPanel>
@@ -334,6 +420,26 @@ function CreatePhase(props) {
                 </LoadingOverlay>
 
             </MenuAppBar>
+            <Dialog open={openPause} onClose={() => setOpenPause(false)}>
+                <DialogTitle>Tạm ngừng quy trình</DialogTitle>
+                <DialogContent>
+                    {
+                        disablePause ? "Bạn có chắc chắn muốn hoạt động lại quy trình này?"
+                            :
+                            "Bạn có chắc chắn muốn dừng quy trình này?"
+                    }
+
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="secondary" onClick={() => setOpenPause(false)}>Hủy</Button>
+                    {
+                        disablePause ?
+                            <Button variant="contained" color="primary" onClick={playProcess}>Đồng ý</Button>
+                            :
+                            <Button variant="contained" color="primary" onClick={pauseProcess}>Đồng ý</Button>
+                    }
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import MenuAppBar from "./menu";
-import {Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button} from "@material-ui/core";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button} from "@material-ui/core";
 import MaterialTable from "material-table";
 import {firestore} from "../../firebaseConfig";
 import {makeStyles} from "@material-ui/core/styles";
@@ -34,7 +34,7 @@ function Home(props) {
         },
 
         {
-            title: "Tên quy trình", field: "amountMoney", type: "string",
+            title: "Tên quy trình", field: "name", type: "string",
             render: data => {
                 if (data.name) {
                     return (
@@ -71,7 +71,13 @@ function Home(props) {
                 if (data.status) {
                     return (
                         <div>
-                            {data.status === "active" ? "Đang hoạt động" : "Tạm ngừng"}
+                            {data.status === "active"
+                                ?
+                                <span className="badge badge-success">Đang hoạt động</span>
+                                :
+                                <span className="badge badge-danger">Tạm ngừng</span>
+
+                            }
                         </div>
                     )
                 }
@@ -114,9 +120,6 @@ function Home(props) {
     return (
         <div>
             <MenuAppBar>
-                <Typography variant='h4'>
-                    Danh sách quy trình:
-                </Typography>
                 <div className={classes.table}>
                     <MaterialTable
                         columns={columns}
@@ -127,15 +130,17 @@ function Home(props) {
                             pageSize: 10,
                             actionsColumnIndex: -1,
                             headerStyle: {
-                                backgroundColor: '#3f51b5',
+                                backgroundColor: '#3fb599',
                                 color: '#FFF'
                             },
                             showTextRowsSelected: true,
+                            search: true,
                         }}
                         actions={[
                             {
                                 icon: 'edit',
                                 tooltip: 'Edit',
+                                iconProps: {color: "primary"},
                                 onClick: (event, rowData) => {
                                     // console.log('du lieu hang',rowData);
                                     setData(rowData)
@@ -145,11 +150,11 @@ function Home(props) {
                             {
                                 icon: 'delete',
                                 tooltip: 'Delete',
+                                iconProps: {color: "error"},
                                 onClick: (event, rowData) => {
                                     console.log(rowData);
                                     setDelProcess(rowData)
                                     setData(rowData)
-                                    // setOpenDelete(true);
                                 }
                             },
                         ]}

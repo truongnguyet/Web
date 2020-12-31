@@ -24,6 +24,8 @@ const useStyles = makeStyles(theme => ({
     },
     root: {
         padding: 10,
+        textAlign: "start",
+        marginLeft: 30,
     },
     formControl: {
         margin: theme.spacing(1),

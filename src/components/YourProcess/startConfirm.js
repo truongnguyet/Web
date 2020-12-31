@@ -7,6 +7,7 @@ import FieldValue from "./fieldValue";
 import {firestore} from "../../firebaseConfig";
 import ConfirmNext from "./confirmNext";
 import {toast} from "react-toastify";
+import {Loader, LoadingOverlay} from "react-overlay-loader";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -61,6 +62,7 @@ function StartConfirm({open, setOpen, process}) {
                 const data = querySnap.docs.map(function (doc, index) {
                     return {...doc.data(), id: doc.id, index}
                 });
+                // console.log('index === ', data.length);
                 setPhaseValue(data)
                 setPhaseStep(data?.length)
                 setLoading(false)
@@ -74,10 +76,11 @@ function StartConfirm({open, setOpen, process}) {
                     .orderBy('index')
                     .get()
                 const phase = phaseRef.docs.map(doc => doc.data())
-                console.log('phase hiện tại', phase[phaseStep]);
+                // console.log('phase hiện tại', phase[phaseStep]);
                 setNextPhase(phase[phaseStep])
                 if (phaseStep <= 2) {
                     setPhase3(phase[phaseStep + 1])
+                    // console.log('Phase so 3', phase[phaseStep + 1])
                 }
 
             }
@@ -122,66 +125,90 @@ function StartConfirm({open, setOpen, process}) {
     }
     return (
         <div>
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Xác nhận quy trình
-                    <Cancel className={classes.cancelButton} onClick={handleClose}/>
-                </DialogTitle>
-                <DialogContent>
-                    <div className={classes.root}>
-                        <Grid container>
-                            <Grid item xs={6} className={classes.leftGrid}>
-                                <Typography style={{color: "black"}}>Thông tin quy trình</Typography>
+            <LoadingOverlay>
+                <Loader loading={loading} text={""}/>
+                <Dialog open={open} onClose={handleClose}>
+                    <DialogTitle>Xác nhận quy trình
+                        <Cancel className={classes.cancelButton} onClick={handleClose}/>
+                    </DialogTitle>
+                    <DialogContent>
+                        <div className={classes.root}>
+                            <Grid container>
+                                <Grid item xs={6} className={classes.leftGrid}>
+                                    <Typography style={{color: "black"}}>Thông tin quy trình</Typography>
 
-                                {
-                                    phaseValue.length
-                                        ? phaseValue.map((phase, index) => {
-                                            return (
-                                                <div key={index}>
-                                                    {
-                                                        index !== 0 ? <Divider/> : null
-                                                    }
-                                                    <FieldValue arrayField={phase.fields}/>
+                                    {
+                                        phaseValue.length
+                                            ? phaseValue.map((phase, index) => {
+                                                return (
+                                                    <div key={index}>
+                                                        {
+                                                            index !== 0 ? <Divider
+                                                                style={{
+                                                                    color: "black",
+                                                                    fontWeight: "bold",
+                                                                    height: "3px"
+                                                                }}/> : null
+                                                        }
+                                                        <FieldValue arrayField={phase.fields}/>
 
-                                                </div>
+                                                    </div>
 
-                                            )
-                                        })
-                                        :
-                                        <Typography>Loading....</Typography>
-                                }
+                                                )
+                                            })
+                                            :
+                                            <Typography>Loading....</Typography>
+                                    }
 
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography style={{color: "black"}}>Thông tin cần xử lý</Typography>
+                                    {
+                                        phase3 && nextPhase && nextPhase.fields && Array.isArray(nextPhase.fields) && phaseStep === 1 ?
+                                            <ConfirmNext arrayField={nextPhase.fields}
+                                                         setArrayField={setField}
+                                                         openDialog={openDialog}
+                                                         setOpenDialog={setOpenDialog}
+                                                         user={phase3?.users}
+                                                         process={process}
+                                                         phase={nextPhase}
+                                                         setOpen={setOpen}
+                                            />
+                                            :
+                                            <div>
+                                                {
+                                                    nextPhase && nextPhase.fields && Array.isArray(nextPhase.fields) && phaseStep === 2 ?
+                                                        <ConfirmNext arrayField={nextPhase.fields}
+                                                                     setArrayField={setField}
+                                                                     openDialog={openDialog}
+                                                                     setOpenDialog={setOpenDialog}
+                                                                     process={process}
+                                                                     phase={nextPhase}
+                                                                     setOpen={setOpen}
+                                                        />
+                                                        :
+                                                        <Typography>Không có trường nào được tạo</Typography>
+                                                }
+                                            </div>
+
+
+                                    }
+                                </Grid>
                             </Grid>
-                            <Grid item xs={6}>
-                                Màn hình cần xác nhận
-                                {
-                                    phase3 && nextPhase && nextPhase.fields && Array.isArray(nextPhase.fields) ?
-                                        <ConfirmNext arrayField={nextPhase.fields}
-                                                     setArrayField={setField}
-                                                     openDialog={openDialog}
-                                                     setOpenDialog={setOpenDialog}
-                                                     user={phase3?.users}
-                                                     process={process}
-                                                     phase={nextPhase}
-                                                     setOpen={setOpen}
-                                        />
-                                        :
-                                        <Typography>Không có trường nào được tạo</Typography>
-                                }
-                            </Grid>
-                        </Grid>
 
-                    </div>
-                </DialogContent>
-                <DialogActions>
-                    <Button color="secondary" variant='contained' onClick={handleOpenCancel}>Thất bại</Button>
-                    <ThemeProvider theme={theme}>
-                        <Button variant="contained" color="primary" className={classes.margin}
-                                onClick={() => setOpenDialog(true)}>
-                            Xác nhận
-                        </Button>
-                    </ThemeProvider>
-                </DialogActions>
-            </Dialog>
+                        </div>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button color="secondary" variant='contained' onClick={handleOpenCancel}>Thất bại</Button>
+                        <ThemeProvider theme={theme}>
+                            <Button variant="contained" color="primary" className={classes.margin}
+                                    onClick={() => setOpenDialog(true)}>
+                                Xác nhận
+                            </Button>
+                        </ThemeProvider>
+                    </DialogActions>
+                </Dialog>
+            </LoadingOverlay>
             <Dialog open={openCancel} onClose={() => setOpenCancel(false)}>
                 <DialogTitle>Hủy quy trình</DialogTitle>
                 <DialogContent>

@@ -1,7 +1,6 @@
 import React from 'react';
 import TextField from "@material-ui/core/TextField";
 import {Checkbox, FormControlLabel, FormGroup, Radio, Typography} from "@material-ui/core";
-import moment from "moment";
 import Select from "react-select";
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -26,6 +25,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function FieldValue({arrayField}) {
+    // console.log('trường đã tạo', arrayField);
     const classes = useStyles()
     return (
         <div>
@@ -54,7 +54,8 @@ function FieldValue({arrayField}) {
                         if (field.type === 'date')
                             return (
                                 <div key={index} className={classes.container}>
-                                    <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
+                                    <Typography variant="subtitle1">{field.name}<span
+                                        style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <TextField
                                         type="date"
                                         value={field.value}
@@ -70,7 +71,8 @@ function FieldValue({arrayField}) {
                         if (field.type === 'dateTime')
                             return (
                                 <div key={index} className={classes.container}>
-                                    <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
+                                    <Typography variant="subtitle1">{field.name}<span
+                                        style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <TextField
                                         type="datetime-local"
                                         value={field.value}
@@ -85,17 +87,23 @@ function FieldValue({arrayField}) {
                         if (field.type === 'checkBox')
                             return (
                                 <div key={index} className={classes.container}>
-                                    <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
+                                    <Typography variant="subtitle1">{field.name}<span
+                                        style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <Typography variant="caption">{field.description}</Typography>
                                     <FormGroup row>
                                         {
                                             field?.options.map((a, index) => {
+                                                // field?.optionsValue.map((b, idx) => {
                                                 return (
                                                     <FormControlLabel key={index}
-                                                                      control={<Checkbox name={a} disabled/>}
+                                                                      control={<Checkbox
+                                                                          name={a} disabled
+                                                                      />}
                                                                       label={a}
                                                     />
                                                 )
+                                                // })
+
                                             })
                                         }
                                     </FormGroup>
@@ -104,7 +112,8 @@ function FieldValue({arrayField}) {
                         if (field.type === 'time')
                             return (
                                 <div key={index} className={classes.container}>
-                                    <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
+                                    <Typography variant="subtitle1">{field.name}<span
+                                        style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <TextField
                                         type="time"
                                         value={field.value}
@@ -119,7 +128,8 @@ function FieldValue({arrayField}) {
                         if (field.type === 'attachment')
                             return (
                                 <div key={index} className={classes.container}>
-                                    <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
+                                    <Typography variant="subtitle1">{field.name}<span
+                                        style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <TextField
                                         label={field.description}
                                         type="file"
@@ -133,13 +143,16 @@ function FieldValue({arrayField}) {
                         if (field.type === 'radio')
                             return (
                                 <div key={index} className={classes.container}>
-                                    <Typography variant="subtitle1">{field.name}<span style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
+                                    <Typography variant="subtitle1">{field.name}<span
+                                        style={{color: 'red'}}>{field.require ? " (*)" : ""}</span></Typography>
                                     <Typography variant="caption">{field.description}</Typography>
                                     <FormGroup row>
                                         {
                                             field?.options.map((a, index) => {
                                                 return (
-                                                    <FormControlLabel value={a} control={<Radio disabled/>}
+                                                    <FormControlLabel value={a}
+                                                                      control={<Radio disabled
+                                                                                      checked={field?.value === a}/>}
                                                                       label={a} key={index}/>
                                                 )
                                             })

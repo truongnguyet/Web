@@ -105,6 +105,6 @@ const useStyles = makeStyles(theme => ({
         zIndex: 10000
     },
     dialogContainer:{
-        padding:10
+        padding:10,
     }
 }))

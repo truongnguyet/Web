@@ -13,6 +13,10 @@ import {makeStyles} from "@material-ui/core/styles";
 const useStyles = makeStyles(theme => ({
     boldText: {
         fontWeight: "bold"
+    },
+    container: {
+        textAlign: "start",
+        marginLeft:40
     }
 }))
 
@@ -68,11 +72,11 @@ function StartProcess(props) {
             <MenuAppBar>
                 <LoadingOverlay>
                     <Loader loading={loading} text={""}/>
-                    <div>
+                    <div className={classes.container}>
                         <Typography><span className={classes.boldText}>Tên quy trình:</span> {process.name}</Typography>
                         <Typography><span className={classes.boldText}>Giai đoạn:</span> {data.namePhase}</Typography>
                         <Typography style={{color: 'darkgray'}}>({data.desPhase})</Typography>
-                        <p>Mời bạn điền thông tin vào các trường sau: </p>
+                        <p className="h6">Mời bạn điền thông tin vào các trường sau: </p>
                         <div>
                             {
                                 data && data.fields && Array.isArray(data.fields) ?

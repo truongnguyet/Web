@@ -20,7 +20,6 @@ function ConfirmProcess(props) {
     const [openConfirm, setConfirm] = useState(false)
     const [process, setProcess] = useState({})
     const [user] = useGlobal('user')
-    // console.log('du lieu nguoi dung', user.uid)
     const handleClose = () => {
         setConfirm(false)
     }
@@ -80,7 +79,6 @@ function ConfirmProcess(props) {
                 const listProcess = querySnap.docs.map(function (doc, index) {
                     return {...doc.data(), id: doc.id, index}
                 });
-                // console.log('processing',listProcess);
                 setData(listProcess)
                 setLoading(false)
             });
@@ -101,20 +99,22 @@ function ConfirmProcess(props) {
                         columns={columns}
                         data={data}
                         isLoading={loading}
-                        title={'Danh sách quy trình'}
+                        title={'Danh sách quy trình cần xử lý'}
                         options={{
                             pageSize: 10,
                             actionsColumnIndex: -1,
                             headerStyle: {
-                                backgroundColor: '#3f51b5',
+                                backgroundColor: '#3fb599',
                                 color: '#FFF'
                             },
                             showTextRowsSelected: true,
+                            search: true,
                         }}
                         actions={[
                             {
-                                icon: 'doneAll',
+                                icon: 'offline_pin',
                                 tooltip: 'Xác nhận',
+                                iconProps: {color: "secondary"},
                                 onClick: (event, rowData) => {
                                     setProcess(rowData)
                                     setConfirm(true)

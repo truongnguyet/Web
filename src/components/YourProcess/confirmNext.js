@@ -16,7 +16,6 @@ import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
 import {useGlobal} from "reactn";
 import {firestore} from "../../firebaseConfig";
-import {v4 as uuidv4} from "uuid";
 import {toast} from "react-toastify";
 
 
@@ -39,12 +38,17 @@ const useStyles = makeStyles(theme => ({
     buttonAction: {
         textAlign: "right",
         marginTop: 20,
+    },
+    dialogAss: {
+        height: 200,
+        margin: "auto",
+        width: 300
     }
 
 }));
 
 function ConfirmNext({arrayField, user, setArrayField, phase, process, openDialog, setOpenDialog, setOpen}) {
-    console.log('những user ở phase tiếp theo', user);
+    // console.log('những user ở phase tiếp theo', user);
     const classes = useStyles();
     const history = useHistory()
     const [loading, setLoading] = useState(false)
@@ -77,6 +81,48 @@ function ConfirmNext({arrayField, user, setArrayField, phase, process, openDialo
                 .doc(id)
                 .set({
                     nextUser: userAssign.id,
+                    currentPhase: phase.namePhase
+                }, {merge: true})
+
+            const data = {
+                id: phase.id,
+                namePhase: phase.namePhase,
+                desPhase: phase.desPhase || '',
+                step: phase.index,    ///phase thu may
+                fields: values,
+                users: phase.users,
+            }
+
+            const phasingRef = firestore.doc(`processing/${id}/phasing/${phase.id}`)
+            batch.set(phasingRef,
+                data
+                , {merge: true})
+
+            await batch.commit()
+            toast.success('Gửi đi thành công')
+        } catch (e) {
+            setLoading(false)
+            console.log(e);
+            toast.error(`Lỗi `)
+        } finally {
+            setLoading(false)
+            setOpenDialog(false)
+            setOpen(false)
+            history.push('/confirm')
+        }
+    }
+    const onAddData3 = async () => {
+        setLoading(true)
+        try {
+            // check data có required hay không
+            let id = process?.id
+            const batch = firestore.batch()
+            await firestore.collection(`processing`)
+                .doc(id)
+                .set({
+                    nextUser: "",
+                    currentPhase: phase.namePhase,
+                    isKetThuc: true,
                 }, {merge: true})
 
             const data = {
@@ -310,11 +356,11 @@ function ConfirmNext({arrayField, user, setArrayField, phase, process, openDialo
                     })
             }
             {
-                user?.length !== 0 ?
+                user ?
                     <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                         <DialogTitle> Chọn người để chuyển tiếp</DialogTitle>
                         <DialogContent>
-                            <div>
+                            <div className={classes.dialogAss}>
                                 <Typography>Bạn muốn gửi đến ai?</Typography>
                                 <Select
                                     name="colors"
@@ -347,7 +393,7 @@ function ConfirmNext({arrayField, user, setArrayField, phase, process, openDialo
                                 Hủy
                             </Button>
                             <Button disabled={loading} variant="contained" color="primary"
-                                    onClick={onAddData}
+                                    onClick={onAddData3}
                             >
                                 Đồng ý
                             </Button>

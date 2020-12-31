@@ -32,7 +32,7 @@ function ListProcess(props) {
         },
 
         {
-            title: "Tên quy trình", field: "amountMoney", type: "string",
+            title: "Tên quy trình", field: "name", type: "string",
             render: data => {
                 if (data.name) {
                     return (
@@ -69,7 +69,13 @@ function ListProcess(props) {
                 if (data.status) {
                     return (
                         <div>
-                            {data.status === "active" ? "Đang hoạt động" : "Tạm ngừng"}
+                            {data.status === "active"
+                                ?
+                                <span class="badge badge-success">Đang hoạt động</span>
+                                :
+                                <span className="badge badge-danger">Tạm ngừng</span>
+
+                            }
                         </div>
                     )
                 }
@@ -107,15 +113,17 @@ function ListProcess(props) {
                             pageSize: 10,
                             actionsColumnIndex: -1,
                             headerStyle: {
-                                backgroundColor: '#3f51b5',
+                                backgroundColor: '#3fb599',
                                 color: '#FFF'
                             },
                             showTextRowsSelected: true,
+                            search: true,
                         }}
                         actions={[
                             {
-                                icon: 'visibility',
+                                icon: 'forward',
                                 tooltip: 'Chạy quy trình',
+                                iconProps: {color: "primary"},
                                 onClick: (event, rowData) => {
                                     setData(rowData)
                                     history.push("/start?id=" + rowData.id)
