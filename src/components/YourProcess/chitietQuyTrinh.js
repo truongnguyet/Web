@@ -9,11 +9,13 @@ import {
     Typography,
     Tab,
     Tabs,
-    AppBar
 } from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 import {firestore} from "../../firebaseConfig";
 import {Loader, LoadingOverlay} from "react-overlay-loader";
+import SwipeableViews from "react-swipeable-views";
+import FieldValue from "./fieldValue";
+import {toast} from "react-toastify";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -53,16 +55,23 @@ function a11yProps(index) {
 
 function ChitietQuyTrinh({open, setOpen, idPro}) {
     const classes = useStyles()
+    const theme = useTheme();
     const [loading, setLoading] = useState(false)
     const [listPhase, setListPhase] = useState([])
     const [value, setValue] = React.useState(0);
+    const [openDialog, setOpenDialog] = useState(false)
+    const [process, setProcess] = useState(false)
 
     const handleClose = () => {
         setOpen(false)
     }
 
     const handleChange = (event, newValue) => {
+        console.log(newValue);
         setValue(newValue);
+    };
+    const handleChangeIndex = index => {
+        setValue(index);
     };
     const getData = () => {
         setLoading(true)
@@ -72,17 +81,56 @@ function ChitietQuyTrinh({open, setOpen, idPro}) {
                     return {...doc.data(), id: doc.id, index}
                 });
                 setListPhase(list)
-                console.log('list phasing', list);
                 setLoading(false)
             });
+    }
+    const cancelProcess = async () => {
+        try {
+            setLoading(true)
+            await firestore.collection(`processing`)
+                .doc(idPro)
+                .set({
+                    status: "cancel",
+                    nextUser: "",
+                }, {merge: true})
+
+            toast.success("Bạn đã hủy quy trình này!")
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setLoading(false)
+            setOpenDialog(false)
+            setOpen(false)
+        }
     }
     useEffect(() => {
         if (!idPro) return;
         let unsub = getData()
+        getProcess()
         return () => {
             if (unsub) unsub()
         }
     }, [idPro])
+    const handleHuy = () => {
+        setOpenDialog(true)
+    }
+    const getProcess = async () => {
+        try {
+            setLoading(true)
+            await firestore.doc(`processing/${idPro}`)
+                .get()
+                .then(function (snap) {
+                    if (!snap.exists)
+                        return
+                    setProcess(snap.data());
+                });
+        } catch (e) {
+
+        } finally {
+            setLoading(false)
+        }
+
+    }
     return (
         <div>
             <LoadingOverlay>
@@ -94,28 +142,39 @@ function ChitietQuyTrinh({open, setOpen, idPro}) {
                             {
                                 listPhase && listPhase.length ?
                                     <div>
-                                        {
-                                            listPhase?.map((phase, index) => {
-                                                return (
-                                                    (
-                                                        <div key={index}>
-                                                            {/*<AppBar position="static">*/}
-                                                            <Tabs value={value} onChange={handleChange}
-                                                                  aria-label="simple tabs example">
-                                                                <Tab label={phase.namePhase} {...a11yProps(index)} />
-                                                            </Tabs>
-                                                            {/*</AppBar>*/}
-                                                            <TabPanel value={value} index={index}>
-                                                                Item {index}
-                                                                <div>
-
-                                                                </div>
-                                                            </TabPanel>
-                                                        </div>
+                                        <Tabs value={value} onChange={handleChange}
+                                              aria-label="simple tabs example">
+                                            {
+                                                listPhase?.map((phase, index) => {
+                                                    return (
+                                                        (
+                                                            <Tab label={phase.namePhase} {...a11yProps(index)}
+                                                                 key={index}/>
+                                                        )
                                                     )
-                                                )
-                                            })
-                                        }
+                                                })
+                                            }
+                                        </Tabs>
+                                        <div>
+                                            <SwipeableViews
+                                                axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                                                index={value}
+                                                onChangeIndex={handleChangeIndex}
+                                            >
+                                                {
+                                                    listPhase && listPhase.length > 0 && listPhase.map((phase, index) => {
+                                                        return (
+                                                            <TabPanel key={index} value={value} index={index}
+                                                                      dir={theme.direction}
+                                                                      className={classes.body}>
+                                                                <p>{phase.label}</p>
+                                                                <FieldValue arrayField={phase.fields}/>
+                                                            </TabPanel>
+                                                        )
+                                                    })}
+
+                                            </SwipeableViews>
+                                        </div>
                                     </div>
 
                                     :
@@ -127,7 +186,31 @@ function ChitietQuyTrinh({open, setOpen, idPro}) {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose} color="secondary" variant="contained">Thoát</Button>
-                        <Button color={"primary"} variant="contained">Hủy quy trình</Button>
+                        {
+                            process?.status !== "cancel" ?
+                                <Button color={"primary"} variant="contained"
+                                        disabled={listPhase.length === 3 || loading}
+                                        onClick={handleHuy}
+                                >Hủy quy trình</Button>
+                                :
+                                null
+                        }
+
+                    </DialogActions>
+                </Dialog>
+                <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                    <DialogTitle> Xác nhận hủy quy trình</DialogTitle>
+                    <DialogContent>Bạn có chắc chắn hủy quy trình này?</DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenDialog(false)} disabled={loading} variant="contained"
+                                color="secondary">
+                            Hủy
+                        </Button>
+                        <Button disabled={loading} variant="contained" color="primary"
+                                onClick={cancelProcess}
+                        >
+                            Đồng ý
+                        </Button>
                     </DialogActions>
                 </Dialog>
             </LoadingOverlay>

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import MenuAppBar from "../Home/menu";
 import {makeStyles} from "@material-ui/core/styles";
-import {useHistory} from "react-router-dom";
 import {firestore} from "../../firebaseConfig";
 import MaterialTable from "material-table";
 import {useGlobal} from 'reactn'
@@ -58,15 +57,22 @@ function YourProcess(props) {
             }
         },
         {
-            title: "Kết quả", field: "state", type: "string",
+            title: "Kết quả", field: "status", type: "string",
             render: data => {
-                if (data.state) {
+                if (data.status) {
                     return (
                         <div>
-                            {data.state === 1 ?
-                                <span className="badge badge-success">Thành công</span>
+                            {data.status === "processing" ?
+                                <span className="badge badge-warning">Đang xử lý</span>
                                 :
-                                <span className="badge badge-danger">Thất bại</span>
+                                data.status === "reject" ?
+                                    <span className="badge badge-danger">Thất bại</span>
+                                    :
+                                    data.status === "cancel" ?
+                                        <span className="badge badge-dark">Đã hủy</span>
+                                        :
+
+                                    <span className="badge badge-success">Thành công</span>
 
                             }
 
@@ -85,7 +91,6 @@ function YourProcess(props) {
                 const listProcess = querySnap.docs.map(function (doc, index) {
                     return {...doc.data(), id: doc.id, index}
                 });
-                console.log('processing', listProcess);
                 setData(listProcess)
                 setLoading(false)
             });

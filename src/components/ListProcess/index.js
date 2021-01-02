@@ -71,7 +71,7 @@ function ListProcess(props) {
                         <div>
                             {data.status === "active"
                                 ?
-                                <span class="badge badge-success">Đang hoạt động</span>
+                                <span className="badge badge-success">Đang hoạt động</span>
                                 :
                                 <span className="badge badge-danger">Tạm ngừng</span>
 
@@ -132,7 +132,6 @@ function ListProcess(props) {
                         ]}
                     />
                 </div>
-                <IconInput/>
             </MenuAppBar>
         </div>
     );

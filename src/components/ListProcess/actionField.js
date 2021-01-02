@@ -92,6 +92,7 @@ function ActionField({arrayField, user, setArrayField, phase, process}) {
                 nameProcess: process.name,
                 idProcess: process.id,
                 currentPhase: phase.namePhase,
+                status: "processing"
             }
             const data = {
                 id: phase.id,

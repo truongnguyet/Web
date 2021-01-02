@@ -93,16 +93,15 @@ function FieldValue({arrayField}) {
                                     <FormGroup row>
                                         {
                                             field?.options.map((a, index) => {
-                                                // field?.optionsValue.map((b, idx) => {
                                                 return (
                                                     <FormControlLabel key={index}
                                                                       control={<Checkbox
-                                                                          name={a} disabled
+                                                                          disabled
+                                                                          checked={Boolean(field?.optionsValue && field?.optionsValue[index])}
                                                                       />}
                                                                       label={a}
                                                     />
                                                 )
-                                                // })
 
                                             })
                                         }

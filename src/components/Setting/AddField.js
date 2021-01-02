@@ -21,9 +21,6 @@ import RenderField from "./renderField";
 
 const useStyles = makeStyles(theme => ({
     container: {
-        // width: 700,
-        // height: '70vh',
-        // backgroundColor: 'blue',
         padding: 0
     },
     content: {

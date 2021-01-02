@@ -158,7 +158,7 @@ function CreatePhase(props) {
             }
 
             const data = processSnap.data()
-            console.log('du lieu cua process', data);
+            // console.log('du lieu cua process', data);
             if (data && data.status !== "active") {
                 setDisablePause(true)
             }

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, Typography} from "@material-ui/core";
 import {green} from '@material-ui/core/colors';
-import {createMuiTheme, withStyles, makeStyles, ThemeProvider} from '@material-ui/core/styles';
+import {createMuiTheme, makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import {Cancel} from "@material-ui/icons";
 import FieldValue from "./fieldValue";
 import {firestore} from "../../firebaseConfig";
@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
         cursor: "pointer"
     },
     root: {
-        width: 600,
         height: '70vh',
         margin: "auto"
     },
@@ -114,7 +113,8 @@ function StartConfirm({open, setOpen, process}) {
             await firestore.collection(`processing`)
                 .doc(id)
                 .set({
-                    state: 0
+                    state: 0,
+                    status: "reject"
                 }, {merge: true})
             setOpenCancel(false)
             setOpen(false)
@@ -127,7 +127,7 @@ function StartConfirm({open, setOpen, process}) {
         <div>
             <LoadingOverlay>
                 <Loader loading={loading} text={""}/>
-                <Dialog open={open} onClose={handleClose}>
+                <Dialog open={open} onClose={handleClose} fullWidth maxWidth={"lg"}>
                     <DialogTitle>Xác nhận quy trình
                         <Cancel className={classes.cancelButton} onClick={handleClose}/>
                     </DialogTitle>
@@ -199,7 +199,7 @@ function StartConfirm({open, setOpen, process}) {
                         </div>
                     </DialogContent>
                     <DialogActions>
-                        <Button color="secondary" variant='contained' onClick={handleOpenCancel}>Thất bại</Button>
+                        <Button color="secondary" variant='contained' onClick={handleOpenCancel}>Hủy quy trình</Button>
                         <ThemeProvider theme={theme}>
                             <Button variant="contained" color="primary" className={classes.margin}
                                     onClick={() => setOpenDialog(true)}>

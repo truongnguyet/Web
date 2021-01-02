@@ -81,7 +81,7 @@ function ConfirmNext({arrayField, user, setArrayField, phase, process, openDialo
                 .doc(id)
                 .set({
                     nextUser: userAssign.id,
-                    currentPhase: phase.namePhase
+                    currentPhase: phase.namePhase,
                 }, {merge: true})
 
             const data = {
@@ -123,6 +123,7 @@ function ConfirmNext({arrayField, user, setArrayField, phase, process, openDialo
                     nextUser: "",
                     currentPhase: phase.namePhase,
                     isKetThuc: true,
+                    status:"confirm"
                 }, {merge: true})
 
             const data = {

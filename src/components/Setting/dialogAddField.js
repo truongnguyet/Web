@@ -80,8 +80,9 @@ function DialogAddField({open, setOpen, type}) {
         setName('')
         setDescription('')
         setRequire(true)
+        setListOption(listOptionDefault)
         setOpen(false)
-        setListOption([])
+
     }
     return (
         <div>
