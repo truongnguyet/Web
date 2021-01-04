@@ -3,5 +3,6 @@ import { setGlobal} from 'reactn'
 setGlobal({
     user:{},
     listPhase: [],
-    addedFields:[]
+    addedFields:[],
+    role: ''
 })

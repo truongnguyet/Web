@@ -17,8 +17,10 @@ import StartProcess from "./components/ListProcess/startProcess";
 import StartConfirm from "./components/YourProcess/startConfirm";
 
 function App() {
-    const [, setUser] = useGlobal('user')
+    const [user, setUser] = useGlobal('user')
+    const [role, setRole] = useGlobal('role')
     const history = useHistory()
+
     useEffect(() => {
         let sub = auth.onAuthStateChanged(user => {
             if (user) {
@@ -61,6 +63,22 @@ function App() {
 
 
     }
+    const getUser = async () => {
+        try {
+            const userSnap = await firestore.doc(`users/${user.uid}`)
+                .get()
+            const data = userSnap.data()
+            await setRole(data?.role)
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    useEffect(() => {
+        if (!user.uid) return;
+        getUser()
+
+    }, [user])
+
     return (
         <div className="App">
             <Switch>

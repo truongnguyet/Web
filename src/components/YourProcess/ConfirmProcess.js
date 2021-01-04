@@ -3,7 +3,6 @@ import MenuAppBar from "../Home/menu";
 import {firestore} from "../../firebaseConfig";
 import MaterialTable from "material-table";
 import {makeStyles} from "@material-ui/core/styles";
-import {useHistory} from "react-router-dom";
 import StartConfirm from "./startConfirm";
 import {useGlobal} from 'reactn'
 
@@ -20,9 +19,6 @@ function ConfirmProcess(props) {
     const [openConfirm, setConfirm] = useState(false)
     const [process, setProcess] = useState({})
     const [user] = useGlobal('user')
-    const handleClose = () => {
-        setConfirm(false)
-    }
 
     const [columns] = useState([
         {

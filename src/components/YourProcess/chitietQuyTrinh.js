@@ -67,7 +67,6 @@ function ChitietQuyTrinh({open, setOpen, idPro}) {
     }
 
     const handleChange = (event, newValue) => {
-        console.log(newValue);
         setValue(newValue);
     };
     const handleChangeIndex = index => {

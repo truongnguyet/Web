@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core/styles";
 import {
     Drawer,
@@ -17,9 +17,9 @@ import {
 } from "@material-ui/core";
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import {isRoute, menuItems} from "./constants";
+import {isRoute, menuItems, menuItemsUser} from "./constants";
 import {useHistory} from 'react-router-dom'
-import {auth} from "../../firebaseConfig";
+import {auth, firestore} from "../../firebaseConfig";
 import {useGlobal} from 'reactn'
 import UserAvatar from "./UserAvatar";
 
@@ -88,8 +88,10 @@ export default function MenuAppBar({children}) {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = useState(null);
     const [openMenu, setOpenMenu] = useState(true)
+    const [loading, setLoading] = useState(false)
     const history = useHistory()
     const [user] = useGlobal('user');
+    const [role] = useGlobal('role');
 
     const open = Boolean(anchorEl);
 
@@ -103,7 +105,6 @@ export default function MenuAppBar({children}) {
     const onSignOut = () => {
         auth.signOut();
     }
-
 
     return (
         <div className={classes.root}>
@@ -151,11 +152,11 @@ export default function MenuAppBar({children}) {
                                     <MenuItem onClick={onSignOut}>Đăng xuất</MenuItem>
                                 </Menu>
                             </div>
-                                :
-                                <div>
-                                    <AccountCircle/>
+                            :
+                            <div>
+                                <AccountCircle/>
 
-                                </div>
+                            </div>
                         }
                     </div>
                 </Toolbar>
@@ -171,16 +172,30 @@ export default function MenuAppBar({children}) {
                 <div className={classes.toolbar}/>
                 <Divider/>
                 <List>
-                    {menuItems.map((item, index) => (
-                        <ListItem button key={index} onClick={() => {
-                            history.push(item.route)
-                        }} style={{background: isRoute(item.route) ? "rgba(3, 244, 222)" : ""}}>
-                            <ListItemIcon>
-                                {isRoute(item.route) ? item.iconActive : item.iconName}
-                            </ListItemIcon>
-                            <ListItemText primary={item.name} className={classes.menuName}/>
-                        </ListItem>
-                    ))}
+                    {
+                        role === 'admin' ?
+                            menuItems.map((item, index) => (
+                                <ListItem button key={index} onClick={() => {
+                                    history.push(item.route)
+                                }} style={{background: isRoute(item.route) ? "rgba(3, 244, 222)" : ""}}>
+                                    <ListItemIcon>
+                                        {isRoute(item.route) ? item.iconActive : item.iconName}
+                                    </ListItemIcon>
+                                    <ListItemText primary={item.name} className={classes.menuName}/>
+                                </ListItem>
+                            ))
+                            :
+                            menuItemsUser.map((item, index) => (
+                                <ListItem button key={index} onClick={() => {
+                                    history.push(item.route)
+                                }} style={{background: isRoute(item.route) ? "rgba(3, 244, 222)" : ""}}>
+                                    <ListItemIcon>
+                                        {isRoute(item.route) ? item.iconActive : item.iconName}
+                                    </ListItemIcon>
+                                    <ListItemText primary={item.name} className={classes.menuName}/>
+                                </ListItem>
+                            ))
+                    }
                 </List>
             </Drawer>
             <main className={classes.content}>

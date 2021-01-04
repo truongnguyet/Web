@@ -69,13 +69,7 @@ function ListProcess(props) {
                 if (data.status) {
                     return (
                         <div>
-                            {data.status === "active"
-                                ?
-                                <span className="badge badge-success">Đang hoạt động</span>
-                                :
-                                <span className="badge badge-danger">Tạm ngừng</span>
-
-                            }
+                            <span className="badge badge-success">Đang hoạt động</span>
                         </div>
                     )
                 }
